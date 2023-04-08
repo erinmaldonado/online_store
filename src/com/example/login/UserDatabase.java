@@ -7,7 +7,7 @@ import java.sql.SQLException;
 public class UserDatabase {
 
 	public boolean registerUser(User user) {
-		String query = "INSERT INTO users (username, password, firstName, lastName, email) VALUES (?, ?, ?, ?, ?)";
+		String query = "INSERT INTO user (username, password, firstName, lastName, email) VALUES (?, ?, ?, ?, ?)";
 		try (Connection connection = DBConnection.getConnection();
 			  PreparedStatement preparedStatement = connection.prepareStatement(query)) {
 
@@ -26,7 +26,7 @@ public class UserDatabase {
 	}
 
 	public User loginUser(String username, String password) {
-		String query = "SELECT * FROM users WHERE username = ? AND password = ?";
+		String query = "SELECT * FROM user WHERE username = ? AND password = ?";
 		try (Connection connection = DBConnection.getConnection();
 			  PreparedStatement preparedStatement = connection.prepareStatement(query)) {
 

@@ -1,8 +1,10 @@
 package com.example.login;
 
+import org.junit.jupiter.api.BeforeEach;
+
 class RegistrationTest {
 
-	@org.junit.jupiter.api.BeforeEach
+	@BeforeEach
 	void setUp() {
 	}
 
