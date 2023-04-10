@@ -2,10 +2,10 @@ package com.example.login;
 
 import javax.swing.*;
 
-public class PostItemFrame extends JFrame{
+public class ReviewItemFrame extends JFrame{
     private final User currentUser;
 
-    public PostItemFrame(User user) {
+    public ReviewItemFrame(User user) {
         this.currentUser = user;
 
         setTitle("Post Item");
@@ -13,8 +13,7 @@ public class PostItemFrame extends JFrame{
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
         // Add the post item form
-        PostItem postItemForm = new PostItem(currentUser);
-        getContentPane().add(postItemForm.postItemPanel);
-
+        ReviewItem reviewItemForm = new ReviewItem(currentUser);
+        getContentPane().add(reviewItemForm.reviewItemPanel);
     }
 }

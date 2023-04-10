@@ -118,23 +118,57 @@ public class ItemsDatabase {
 
     public List<Item> searchItemsByCategory(String category) {
         List<Item> items = new ArrayList<>();
-        try (Connection conn = DBConnection.getConnection()) {
-            String query = "SELECT * FROM items WHERE category=?";
-            PreparedStatement ps = conn.prepareStatement(query);
-            ps.setString(1, category);
-            ResultSet rs = ps.executeQuery();
-            while (rs.next()) {
-                int itemId = rs.getInt("item_id");
-                String itemName = rs.getString("item_name");
-                String itemDescription = rs.getString("item_description");
-                double itemPrice = rs.getDouble("item_price");
-                String itemCategory = rs.getString("category");
-                Item item = new Item(itemId, itemName, itemDescription, itemPrice, itemCategory);
+        ResultSet resultSet = null;
+        PreparedStatement preparedStatement = null;
+        Connection conn = null;
+        try (Connection connection = DBConnection.getConnection()) {
+            String sql = "SELECT items.* FROM items " +
+                    "JOIN item_categories ON items.item_id = item_categories.item_id " +
+                    "JOIN categories ON item_categories.category_id = categories.category_id " +
+                    "WHERE categories.name = ?";
+            preparedStatement = connection.prepareStatement(sql);
+            preparedStatement.setString(1, category);
+            resultSet = preparedStatement.executeQuery();
+
+            // Extract the data from the ResultSet
+            while (resultSet.next()) {
+                int itemId = resultSet.getInt("item_id");
+                String title = resultSet.getString("title");
+                String description = resultSet.getString("description");
+                String datePosted = resultSet.getString("date_posted");
+                double price = resultSet.getDouble("price");
+                String username = resultSet.getString("username");
+
+                Item item = new Item(itemId, title, description, datePosted, price, username);
                 items.add(item);
             }
-        } catch (SQLException ex) {
-            ex.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if (resultSet != null) resultSet.close();
+                if (preparedStatement != null) preparedStatement.close();
+                if (conn != null) conn.close();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
+
         return items;
+    }
+
+    public List<String> getCategories() {
+        List<String> categories = new ArrayList<>();
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement("SELECT DISTINCT category FROM items")) {
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    categories.add(rs.getString("category"));
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return categories;
     }
 }

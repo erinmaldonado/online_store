@@ -10,7 +10,7 @@ public class PostItem {
 	JPanel postItemPanel;
 	private JTextField categoryField;
 
-	private User currentUser;
+	private final User currentUser;
 
 	public PostItem(User user){
 		System.out.println("PostItem constructor called"); // Debugging line

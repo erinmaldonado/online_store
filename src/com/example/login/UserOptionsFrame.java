@@ -2,7 +2,7 @@ package com.example.login;
 import javax.swing.JFrame;
 
 public class UserOptionsFrame extends JFrame {
-    private User currentUser;
+    private final User currentUser;
 
     public UserOptionsFrame(User user) {
         this.currentUser = user;

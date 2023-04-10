@@ -5,17 +5,19 @@ public class Item {
     private String itemName;
     private String itemDescription;
     private double itemPrice;
-    private String itemCategory;
+    private String datePosted;
+    private String username;
 
     public Item() {
     }
 
-    public Item(int itemId, String itemName, String itemDescription, double itemPrice, String itemCategory) {
+    public Item(int itemId, String itemName, String itemDescription, String datePosted, double itemPrice, String username) {
         this.itemId = itemId;
         this.itemName = itemName;
         this.itemDescription = itemDescription;
+        this.datePosted = datePosted;
         this.itemPrice = itemPrice;
-        this.itemCategory = itemCategory;
+        this.username = username;
     }
 
     public int getItemId() {
@@ -48,13 +50,5 @@ public class Item {
 
     public void setItemPrice(double itemPrice) {
         this.itemPrice = itemPrice;
-    }
-
-    public String getItemCategory() {
-        return itemCategory;
-    }
-
-    public void setItemCategory(String itemCategory) {
-        this.itemCategory = itemCategory;
     }
 }
