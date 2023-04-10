@@ -2,6 +2,8 @@ package com.example.login;
 
 import java.sql.*;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 public class ReviewsDatabase {
 
@@ -52,5 +54,27 @@ public class ReviewsDatabase {
                 return false;
             }
         }
+    }
+
+    public List<Review> getReviewsForItem(int itemId) {
+        List<Review> reviews = new ArrayList<>();
+
+        try (Connection connection = DBConnection.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement("SELECT username, rating, description FROM reviews WHERE item_id = ?")) {
+            preparedStatement.setInt(1, itemId);
+
+            try (ResultSet rs = preparedStatement.executeQuery()) {
+                while (rs.next()) {
+                    String username = rs.getString("username");
+                    String rating = rs.getString("rating");
+                    String description = rs.getString("description");
+                    reviews.add(new Review(username, rating, description));
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return reviews;
     }
 }

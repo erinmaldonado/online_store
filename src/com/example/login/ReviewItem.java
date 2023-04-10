@@ -2,19 +2,20 @@ package com.example.login;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
 
+import static javax.swing.SwingUtilities.getWindowAncestor;
+
 public class ReviewItem {
     private final User currentUser;
     private JTextField searchTextField;
     private JButton searchButton;
     JPanel reviewItemPanel;
+    private JButton backButton;
 
     public ReviewItem(User user){
         this.currentUser = user;
@@ -22,6 +23,15 @@ public class ReviewItem {
         searchButton.addActionListener(e -> {
             String category = searchTextField.getText();
             searchItemsByCategory(category);
+        });
+
+        backButton.addActionListener(e -> {
+            JFrame frame = new JFrame("Menu");
+            frame.setContentPane(new UserOptions(currentUser).userOptionsPanel);
+            frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+            frame.pack();
+            frame.setVisible(true);
+            getWindowAncestor(backButton).dispose();
         });
     }
 

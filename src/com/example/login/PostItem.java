@@ -2,6 +2,8 @@ package com.example.login;
 
 import javax.swing.*;
 
+import static javax.swing.SwingUtilities.getWindowAncestor;
+
 public class PostItem {
 	private JTextField titleField;
 	private JTextPane descriptionField;
@@ -9,11 +11,11 @@ public class PostItem {
 	private JButton postButton;
 	JPanel postItemPanel;
 	private JTextField categoryField;
+	private JButton backButton;
 
 	private final User currentUser;
 
 	public PostItem(User user){
-		System.out.println("PostItem constructor called"); // Debugging line
 		this.currentUser = user;
 
 		postButton.addActionListener(e -> {
@@ -42,6 +44,15 @@ public class PostItem {
 			} else {
 				JOptionPane.showMessageDialog(null, "You can only post 3 items per day.");
 			}
+		});
+
+		backButton.addActionListener(e -> {
+			JFrame frame = new JFrame("Menu");
+			frame.setContentPane(new UserOptions(currentUser).userOptionsPanel);
+			frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+			frame.pack();
+			frame.setVisible(true);
+			getWindowAncestor(backButton).dispose();
 		});
 	}
 }

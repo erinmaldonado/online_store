@@ -6,6 +6,7 @@ public class UserOptionsFrame extends JFrame {
 
     public UserOptionsFrame(User user) {
         this.currentUser = user;
+        setTitle("Menu");
         UserOptions userOptions = new UserOptions(currentUser);
         setContentPane(userOptions.userOptionsPanel);
         pack();

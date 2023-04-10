@@ -171,4 +171,31 @@ public class ItemsDatabase {
         }
         return categories;
     }
+
+    public List<Item> getAllItems() {
+        List<Item> items = new ArrayList<>();
+
+        try (Connection connection = DBConnection.getConnection();
+             PreparedStatement stmt = connection.prepareStatement("SELECT * FROM items")) {
+
+            try (ResultSet resultSet = stmt.executeQuery()) {
+                while (resultSet.next()) {
+                    int itemId = resultSet.getInt("item_id");
+                    String title = resultSet.getString("title");
+                    String description = resultSet.getString("description");
+                    String datePosted = resultSet.getString("date_posted");
+                    double price = resultSet.getDouble("price");
+                    String username = resultSet.getString("username");
+
+                    Item item = new Item(itemId, title, description, datePosted, price, username);
+                    items.add(item);
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return items;
+    }
+
 }
