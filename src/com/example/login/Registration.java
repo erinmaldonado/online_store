@@ -46,7 +46,7 @@ public class Registration {
                 user.setEmail(em);
                 boolean isRegistered = userDB.registerUser(user);
                 if (isRegistered) {
-                    JFrame userOptionsFrame = new UserOptionsFrame();
+                    JFrame userOptionsFrame = new UserOptionsFrame(user);
                     // Set the login frame to be visible
                     userOptionsFrame.setVisible(true);
                     // Close the current home frame

@@ -27,7 +27,7 @@ public class Login {
             User user = userDB.loginUser(un, pw);
 
             if (user != null) {
-                JFrame userOptionsFrame = new UserOptionsFrame();
+                JFrame userOptionsFrame = new UserOptionsFrame(user);
                 userOptionsFrame.setVisible(true);
                 getWindowAncestor(loginButton).dispose();
             } else {
