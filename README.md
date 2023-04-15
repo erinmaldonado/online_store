@@ -1,5 +1,6 @@
 # online_store
 Information about the group members' contributions - Erin Maldonado: all parts of project
+* Part 2 demo: [youtube video](https://youtu.be/kgXWu6p3D7c)
 
 - Clone or download the project from version control.
 - Import the project into IDE.
