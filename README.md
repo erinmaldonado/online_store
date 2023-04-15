@@ -1,7 +1,9 @@
 # online_store
 Information about the group members' contributions - Erin Maldonado: all parts of project
-* Part 2 demo: [youtube video](https://youtu.be/kgXWu6p3D7c)
 
+- Demo: [youtube video](https://youtu.be/kgXWu6p3D7c)
+---
+# Instructions to install, configure, and run project.
 - Clone or download the project from version control.
 - Import the project into IDE.
 - Download
