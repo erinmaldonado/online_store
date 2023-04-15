@@ -1,5 +1,7 @@
 package com.example.login;
 import javax.swing.*;
+import java.awt.*;
+
 import static javax.swing.SwingUtilities.getWindowAncestor;
 
 public class Login {
@@ -12,6 +14,7 @@ public class Login {
     public Login() {
         backButton.addActionListener(e -> {
             JFrame frame = new JFrame("Home");
+            frame.setPreferredSize(new Dimension(400, 300));
             frame.setContentPane(new Home().homePanel);
             frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
             frame.pack();
@@ -37,7 +40,5 @@ public class Login {
     }
 
     private void createUIComponents() {
-        // TODO: place custom component creation code here
-        backButton = new JButton("Back");
     }
 }

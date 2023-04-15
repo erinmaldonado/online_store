@@ -27,6 +27,7 @@ public class ReviewItem {
 
         backButton.addActionListener(e -> {
             JFrame frame = new JFrame("Menu");
+            frame.setPreferredSize(new Dimension(400, 300));
             frame.setContentPane(new UserOptions(currentUser).userOptionsPanel);
             frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
             frame.pack();

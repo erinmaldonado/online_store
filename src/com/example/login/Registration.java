@@ -1,6 +1,7 @@
 package com.example.login;
 
 import javax.swing.*;
+import java.awt.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -15,11 +16,13 @@ public class Registration {
     private JButton signUpButton;
     private JButton backButton;
     private JTextField usernameField;
+    private JPasswordField passwordField2;
 
     public Registration() {
         signUpButton.addActionListener(e -> {
             String un = usernameField.getText();
-            String pw = String.valueOf(passwordField.getPassword());
+            String pw1 = String.valueOf(passwordField.getPassword());
+            String pw2 = String.valueOf(passwordField2.getPassword());
             String fn = firstName.getText();
             String ln = lastName.getText();
             String em = email.getText();
@@ -30,23 +33,25 @@ public class Registration {
                 return;
             }
 
+            // Make sure passwords match
+            if (!pw1.equals(pw2)) {
+                JOptionPane.showMessageDialog(null, "Passwords do not match. Please try again.");
+                return;
+            }
+
             UserDatabase userDB = new UserDatabase();
-            User user = userDB.loginUser(un, pw);
+            User user = userDB.loginUser(un, pw1);
 
             // Check if user is already in system
             // If not, add to database
             if (user != null) {
                 JOptionPane.showMessageDialog(null, "User already exists. Go back to Login.");
             } else {
-                user = new User();
-                user.setUsername(un);
-                user.setPassword(pw);
-                user.setFirstName(fn);
-                user.setLastName(ln);
-                user.setEmail(em);
+                user = new User(un, pw1, fn, ln, em);
                 boolean isRegistered = userDB.registerUser(user);
                 if (isRegistered) {
                     JFrame userOptionsFrame = new UserOptionsFrame(user);
+                    userOptionsFrame.setPreferredSize(new Dimension(400, 300));
                     // Set the login frame to be visible
                     userOptionsFrame.setVisible(true);
                     // Close the current home frame
@@ -59,6 +64,7 @@ public class Registration {
 
         backButton.addActionListener(e -> {
             JFrame frame = new JFrame("Home");
+            frame.setPreferredSize(new Dimension(400, 300));
             frame.setContentPane(new Home().homePanel);
             frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
             frame.pack();
@@ -75,7 +81,6 @@ public class Registration {
     }
 
     public void createUIComponents() {
-        // TODO: place custom component creation code here
         usernameField = new JTextField("username");
     }
 

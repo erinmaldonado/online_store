@@ -7,10 +7,8 @@ public class UserOptionsFrame extends JFrame {
     public UserOptionsFrame(User user) {
         this.currentUser = user;
         setTitle("Menu");
+        setSize(400, 300);
         UserOptions userOptions = new UserOptions(currentUser);
-        setContentPane(userOptions.userOptionsPanel);
-        pack();
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setVisible(true);
+        getContentPane().add(userOptions.userOptionsPanel);
     }
 }

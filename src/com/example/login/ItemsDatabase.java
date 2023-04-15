@@ -131,17 +131,7 @@ public class ItemsDatabase {
             resultSet = preparedStatement.executeQuery();
 
             // Extract the data from the ResultSet
-            while (resultSet.next()) {
-                int itemId = resultSet.getInt("item_id");
-                String title = resultSet.getString("title");
-                String description = resultSet.getString("description");
-                String datePosted = resultSet.getString("date_posted");
-                double price = resultSet.getDouble("price");
-                String username = resultSet.getString("username");
-
-                Item item = new Item(itemId, title, description, datePosted, price, username);
-                items.add(item);
-            }
+            getResults(items, resultSet);
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
@@ -155,6 +145,20 @@ public class ItemsDatabase {
         }
 
         return items;
+    }
+
+    private void getResults(List<Item> items, ResultSet resultSet) throws SQLException {
+        while (resultSet.next()) {
+            int itemId = resultSet.getInt("item_id");
+            String title = resultSet.getString("title");
+            String description = resultSet.getString("description");
+            String datePosted = resultSet.getString("date_posted");
+            double price = resultSet.getDouble("price");
+            String username = resultSet.getString("username");
+
+            Item item = new Item(itemId, title, description, datePosted, price, username);
+            items.add(item);
+        }
     }
 
     public List<String> getCategories() {
@@ -179,17 +183,7 @@ public class ItemsDatabase {
              PreparedStatement stmt = connection.prepareStatement("SELECT * FROM items")) {
 
             try (ResultSet resultSet = stmt.executeQuery()) {
-                while (resultSet.next()) {
-                    int itemId = resultSet.getInt("item_id");
-                    String title = resultSet.getString("title");
-                    String description = resultSet.getString("description");
-                    String datePosted = resultSet.getString("date_posted");
-                    double price = resultSet.getDouble("price");
-                    String username = resultSet.getString("username");
-
-                    Item item = new Item(itemId, title, description, datePosted, price, username);
-                    items.add(item);
-                }
+                getResults(items, resultSet);
             }
         } catch (SQLException e) {
             e.printStackTrace();

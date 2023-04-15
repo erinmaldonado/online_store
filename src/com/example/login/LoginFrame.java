@@ -4,7 +4,7 @@ import javax.swing.JFrame;
 public class LoginFrame extends JFrame {
     public LoginFrame() {
         setTitle("Login");
-        setSize(400, 200);
+        setSize(400, 300);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
         // Add the login form
