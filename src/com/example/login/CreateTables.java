@@ -4,6 +4,9 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
 
+/**
+ * This creates the tables to be used in the database.
+ */
 public class CreateTables {
     UserDatabase userDb = new UserDatabase();
     ItemsDatabase itemsDb = new ItemsDatabase();
@@ -13,7 +16,9 @@ public class CreateTables {
 
     public void create(){
         try {
-            Connection connection = DBConnection.getConnection();
+            DBConnection createSchema = new DBConnection();
+            createSchema.create();
+            Connection connection = createSchema.getConnection();
             Statement statement = connection.createStatement();
             statement.execute("DROP TABLE IF EXISTS reviews");
             statement.execute("DROP TABLE IF EXISTS item_categories");
@@ -22,69 +27,81 @@ public class CreateTables {
             statement.execute("DROP TABLE IF EXISTS users");
 
 
-                // Create users table
-                String createUsersTable = "CREATE TABLE users ("
-                        + "username varchar(20) NOT NULL,"
-                        + "password varchar(20) NOT NULL,"
-                        + "firstName varchar(20) NOT NULL,"
-                        + "lastName varchar(20) NOT NULL,"
-                        + "email varchar(99) NOT NULL,"
-                        + "PRIMARY KEY (username),"
-                        + "UNIQUE KEY email (email)"
-                        + ")";
-                statement.executeUpdate(createUsersTable);
+            /**
+             * Table for storing user information.
+             */
+            String createUsersTable = "CREATE TABLE users ("
+                    + "username varchar(20) NOT NULL,"
+                    + "password varchar(20) NOT NULL,"
+                    + "firstName varchar(20) NOT NULL,"
+                    + "lastName varchar(20) NOT NULL,"
+                    + "email varchar(99) NOT NULL,"
+                    + "PRIMARY KEY (username),"
+                    + "UNIQUE KEY email (email)"
+                    + ")";
+            statement.executeUpdate(createUsersTable);
 
-                // Create categories table
-                String createCategoriesTable = "CREATE TABLE categories ("
-                        + "category_id INT AUTO_INCREMENT PRIMARY KEY,"
-                        + "name VARCHAR(255) UNIQUE NOT NULL"
-                        + ")";
-                statement.executeUpdate(createCategoriesTable);
+            /**
+             * Table for storing category information.
+             */
+            String createCategoriesTable = "CREATE TABLE categories ("
+                    + "category_id INT AUTO_INCREMENT PRIMARY KEY,"
+                    + "name VARCHAR(255) UNIQUE NOT NULL"
+                    + ")";
+            statement.executeUpdate(createCategoriesTable);
 
-                // Create items table
-                String createItemsTable = "CREATE TABLE items ("
-                        + "item_id INT AUTO_INCREMENT PRIMARY KEY,"
-                        + "title VARCHAR(255) NOT NULL,"
-                        + "description TEXT NOT NULL,"
-                        + "date_posted DATE NOT NULL,"
-                        + "price DECIMAL(10, 2) NOT NULL,"
-                        + "username varchar(20) NOT NULL,"
-                        + "FOREIGN KEY (username) REFERENCES users(username)"
-                        + ")";
-                statement.executeUpdate(createItemsTable);
+            /**
+             * Table for storing item information.
+             */
+            String createItemsTable = "CREATE TABLE items ("
+                    + "item_id INT AUTO_INCREMENT PRIMARY KEY,"
+                    + "title VARCHAR(255) NOT NULL,"
+                    + "description TEXT NOT NULL,"
+                    + "date_posted DATE NOT NULL,"
+                    + "price DECIMAL(10, 2) NOT NULL,"
+                    + "username varchar(20) NOT NULL,"
+                    + "FOREIGN KEY (username) REFERENCES users(username)"
+                    + ")";
+            statement.executeUpdate(createItemsTable);
 
-                // Create item_categories table
-                String createItemCategoriesTable = "CREATE TABLE item_categories ("
-                        + "item_id INT NOT NULL,"
-                        + "category_id INT NOT NULL,"
-                        + "PRIMARY KEY (item_id, category_id),"
-                        + "FOREIGN KEY (item_id) REFERENCES items(item_id),"
-                        + "FOREIGN KEY (category_id) REFERENCES categories(category_id)"
-                        + ")";
-                statement.executeUpdate(createItemCategoriesTable);
+            /**
+             * Table for storing item category information.
+             */
+            String createItemCategoriesTable = "CREATE TABLE item_categories ("
+                    + "item_id INT NOT NULL,"
+                    + "category_id INT NOT NULL,"
+                    + "PRIMARY KEY (item_id, category_id),"
+                    + "FOREIGN KEY (item_id) REFERENCES items(item_id),"
+                    + "FOREIGN KEY (category_id) REFERENCES categories(category_id)"
+                    + ")";
+            statement.executeUpdate(createItemCategoriesTable);
 
-                // Create reviews table
-                String createReviewsTable = "CREATE TABLE reviews ("
-                        + "review_id INT AUTO_INCREMENT PRIMARY KEY,"
-                        + "item_id INT NOT NULL,"
-                        + "username varchar(20) NOT NULL,"
-                        + "review_date DATE NOT NULL,"
-                        + "score ENUM('Excellent', 'Good', 'Fair', 'Poor') NOT NULL,"
-                        + "remark TEXT,"
-                        + "UNIQUE (item_id, username),"
-                        + "FOREIGN KEY (item_id) REFERENCES items(item_id),"
-                        + "FOREIGN KEY (username) REFERENCES users(username)"
-                        + ")";
-                statement.executeUpdate(createReviewsTable);
+            /**
+             * Table for storing item reviews.
+             */
+            String createReviewsTable = "CREATE TABLE reviews ("
+                    + "review_id INT AUTO_INCREMENT PRIMARY KEY,"
+                    + "item_id INT NOT NULL,"
+                    + "username varchar(20) NOT NULL,"
+                    + "review_date DATE NOT NULL,"
+                    + "score ENUM('Excellent', 'Good', 'Fair', 'Poor') NOT NULL,"
+                    + "remark TEXT,"
+                    + "UNIQUE (item_id, username),"
+                    + "FOREIGN KEY (item_id) REFERENCES items(item_id),"
+                    + "FOREIGN KEY (username) REFERENCES users(username)"
+                    + ")";
+            statement.executeUpdate(createReviewsTable);
 
-                System.out.println("Tables created successfully.");
-                insertData();
+            System.out.println("Tables created successfully.");
+            insertData();
         } catch (SQLException e){
             e.printStackTrace();
         }
     }
 
-    // dummy data to insert
+    /**
+     * dummy data to insert
+     */
     public void insertData(){
         userDb.insertUser("username", "password","Errol","Cattenach","ecattenach0@cmu.edu");
         userDb.insertUser("ecattenach0","rXIC75zfiC50","Errol","Cattenach","ecattenach0@cmu.edu");

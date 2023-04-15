@@ -4,8 +4,20 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-
+/**
+ *
+ * @author Erin Maldonado
+ */
 public class ItemsDatabase {
+    public ItemsDatabase(){}
+
+    /**
+     * @param title
+     * @param description
+     * @param price
+     * @param username
+     * @param categoryNames
+     */
     public void insertItem(String title, String description, double price, String username, String[] categoryNames) {
         String query = "INSERT INTO items (title, description, price, username, date_posted) VALUES (?, ?, ?, ?, ?)";
 
@@ -36,6 +48,10 @@ public class ItemsDatabase {
     }
 
 
+    /**
+     * @param categoryName
+     * @return
+     */
     public int getCategoryId(String categoryName) {
         String query = "SELECT category_id FROM categories WHERE name = ?";
 
@@ -56,6 +72,10 @@ public class ItemsDatabase {
         }
     }
 
+    /**
+     * @param categoryName
+     * @return
+     */
     public int insertCategory(String categoryName) {
         String query = "INSERT INTO categories (name) VALUES (?)";
 
@@ -77,6 +97,10 @@ public class ItemsDatabase {
         return -1;
     }
 
+    /**
+     * @param itemId
+     * @param categoryId
+     */
     public void insertItemCategory(int itemId, int categoryId) {
         String query = "INSERT INTO item_categories (item_id, category_id) VALUES (?, ?)";
 
@@ -94,6 +118,10 @@ public class ItemsDatabase {
     }
 
 
+    /**
+     * @param username
+     * @return
+     */
     public int getItemsPostedToday(String username) {
         String query = "SELECT COUNT(*) FROM items WHERE username = ? AND DATE(date_posted) = CURDATE()";
         int itemCount = 0;
@@ -116,6 +144,10 @@ public class ItemsDatabase {
         return itemCount;
     }
 
+    /**
+     * @param category
+     * @return
+     */
     public List<Item> searchItemsByCategory(String category) {
         List<Item> items = new ArrayList<>();
         ResultSet resultSet = null;
@@ -147,6 +179,11 @@ public class ItemsDatabase {
         return items;
     }
 
+    /**
+     * @param items
+     * @param resultSet
+     * @throws SQLException
+     */
     private void getResults(List<Item> items, ResultSet resultSet) throws SQLException {
         while (resultSet.next()) {
             int itemId = resultSet.getInt("item_id");
@@ -161,6 +198,9 @@ public class ItemsDatabase {
         }
     }
 
+    /**
+     * @return
+     */
     public List<String> getCategories() {
         List<String> categories = new ArrayList<>();
         try (Connection conn = DBConnection.getConnection();
@@ -176,6 +216,9 @@ public class ItemsDatabase {
         return categories;
     }
 
+    /**
+     * @return
+     */
     public List<Item> getAllItems() {
         List<Item> items = new ArrayList<>();
 
