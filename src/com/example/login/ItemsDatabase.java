@@ -185,17 +185,7 @@ public class ItemsDatabase {
      * @throws SQLException
      */
     private void getResults(List<Item> items, ResultSet resultSet) throws SQLException {
-        while (resultSet.next()) {
-            int itemId = resultSet.getInt("item_id");
-            String title = resultSet.getString("title");
-            String description = resultSet.getString("description");
-            String datePosted = resultSet.getString("date_posted");
-            double price = resultSet.getDouble("price");
-            String username = resultSet.getString("username");
-
-            Item item = new Item(itemId, title, description, datePosted, price, username);
-            items.add(item);
-        }
+        getItems(items, resultSet);
     }
 
     /**
@@ -233,6 +223,52 @@ public class ItemsDatabase {
         }
 
         return items;
+    }
+
+
+    public List<Item> getMostExpensiveItemsInEachCategory() {
+        List<Item> mostExpensiveItems = new ArrayList<>();
+        String query = "SELECT i.item_id, i.title, i.description, i.price, i.username, c.name " +
+                "FROM items i " +
+                "JOIN item_categories ic ON i.item_id = ic.item_id " +
+                "JOIN categories c ON c.category_id = ic.category_id " +
+                "WHERE (i.item_id, ic.category_id) IN ( " +
+                "    SELECT item_id, category_id " +
+                "    FROM items i " +
+                "    JOIN item_categories ic ON i.item_id = ic.item_id " +
+                "    WHERE (price, category_id) IN ( " +
+                "        SELECT MAX(price), category_id " +
+                "        FROM items i " +
+                "        JOIN item_categories ic ON i.item_id = ic.item_id " +
+                "        GROUP BY category_id " +
+                "    ) " +
+                ")";
+
+        try (Connection connection = DBConnection.getConnection();
+             PreparedStatement stmt = connection.prepareStatement(query)) {
+
+            ResultSet rs = stmt.executeQuery();
+
+            getItems(mostExpensiveItems, rs);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return mostExpensiveItems;
+    }
+
+    private void getItems(List<Item> mostExpensiveItems, ResultSet rs) throws SQLException {
+        while (rs.next()) {
+            int itemId = rs.getInt("item_id");
+            String title = rs.getString("title");
+            String description = rs.getString("description");
+            String datePosted = rs.getString("date_posted");
+            double price = rs.getDouble("price");
+            String username = rs.getString("username");
+
+            Item item = new Item(itemId, title, description, datePosted, price, username);
+            mostExpensiveItems.add(item);
+        }
     }
 
 }
