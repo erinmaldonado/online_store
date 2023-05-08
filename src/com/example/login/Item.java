@@ -1,5 +1,8 @@
 package com.example.login;
 
+import java.sql.Date;
+import java.util.List;
+
 /**
  * Represents an item.
  * @author Erin Maldonado
@@ -9,8 +12,9 @@ public class Item {
     private String itemName;
     private String itemDescription;
     private double itemPrice;
-    private String datePosted;
+    private Date datePosted;
     private String username;
+    private String category;
 
     /**
      * Class constructor
@@ -28,13 +32,14 @@ public class Item {
      * @param itemPrice The price of the item.
      * @param username The username of the item's creator.
      */
-    public Item(int itemId, String itemName, String itemDescription, String datePosted, double itemPrice, String username) {
+    public Item(int itemId, String itemName, String itemDescription, Date datePosted, double itemPrice, String username, String category) {
         this.itemId = itemId;
         this.itemName = itemName;
         this.itemDescription = itemDescription;
         this.datePosted = datePosted;
         this.itemPrice = itemPrice;
         this.username = username;
+        this.category = category;
     }
 
     /**
@@ -73,4 +78,15 @@ public class Item {
         return itemPrice;
     }
 
+    public Object getUsername() {
+        return username;
+    }
+
+    public void setCategory(String category) {
+        this.category = category;
+    }
+
+    public String getCategoryName() {
+        return category;
+    }
 }

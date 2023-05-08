@@ -6,9 +6,14 @@ public class UserOptionsFrame extends JFrame {
 
     public UserOptionsFrame(User user) {
         this.currentUser = user;
-        setTitle("Menu");
-        setSize(400, 300);
-        UserOptions userOptions = new UserOptions(currentUser);
-        getContentPane().add(userOptions.userOptionsPanel);
+        setTitle("User Options");
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setLocationRelativeTo(null); // Center the frame on the screen
+
+        UserOptions userOptions = new UserOptions(user);
+        setContentPane(userOptions.userOptionsPanel);
+
+        // Automatically adjust the frame size based on its contents
+        pack();
     }
 }

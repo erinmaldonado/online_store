@@ -9,12 +9,14 @@ public class PostItemFrame extends JFrame{
         this.currentUser = user;
 
         setTitle("Post Item");
-        setSize(400, 300);
-        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setLocationRelativeTo(null); // Center the frame on the screen
 
         // Add the post item form
         PostItem postItemForm = new PostItem(currentUser);
-        getContentPane().add(postItemForm.postItemPanel);
+        setContentPane(postItemForm.postItemPanel);
 
+        // Automatically adjust the frame size based on its contents
+        pack();
     }
 }

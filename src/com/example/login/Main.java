@@ -8,9 +8,11 @@ public class Main {
 		createTables.create();
 
 		JFrame frame = new JFrame("Home");
-		frame.setPreferredSize(new Dimension(400, 300));
 		frame.setContentPane(new Home().homePanel);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frame.setLocationRelativeTo(null); // Center the frame on the screen
+
+		// Automatically adjust the frame size based on its contents
 		frame.pack();
 		frame.setVisible(true);
 	}

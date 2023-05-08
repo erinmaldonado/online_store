@@ -8,12 +8,12 @@ import static javax.swing.SwingUtilities.getWindowAncestor;
 
 public class PostItem {
 	private JTextField titleField;
-	private JTextPane descriptionField;
 	private JTextField priceField;
 	private JButton postButton;
 	JPanel postItemPanel;
 	private JTextField categoryField;
 	private JButton backButton;
+	private JTextArea descriptionTextArea;
 
 	private final User currentUser;
 
@@ -28,13 +28,13 @@ public class PostItem {
 
 			if (itemsPostedToday < 3) {
 				String titleFieldText = titleField.getText();
-				String descriptionFieldText = descriptionField.getText();
+				String descriptionTextAreaText = descriptionTextArea.getText();
 				String[] categoryFieldText = categoryField.getText().split(","); // Change this line
 
 				try {
 					double priceFieldText = Double.parseDouble(priceField.getText());
 
-					itemsDatabase.insertItem(titleFieldText, descriptionFieldText, priceFieldText, currentUsername, categoryFieldText);
+					itemsDatabase.insertItem(titleFieldText, descriptionTextAreaText, priceFieldText, currentUsername, categoryFieldText);
 					JOptionPane.showMessageDialog(null, "Item posted.");
 					// go back to user options page
 					JFrame userOptionsFrame = new UserOptionsFrame(currentUser);
@@ -57,5 +57,10 @@ public class PostItem {
 			frame.setVisible(true);
 			getWindowAncestor(backButton).dispose();
 		});
+	}
+
+	private void createUIComponents() {
+		// Set the preferred number of rows and columns for the description box
+		descriptionTextArea = new JTextArea(10, 30); // 10 rows and 30 columns
 	}
 }
