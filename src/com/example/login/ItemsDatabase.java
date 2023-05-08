@@ -270,5 +270,4 @@ public class ItemsDatabase {
             mostExpensiveItems.add(item);
         }
     }
-
 }
