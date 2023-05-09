@@ -1,7 +1,6 @@
 package com.example.login;
 
 import java.sql.Date;
-import java.util.List;
 
 /**
  * Represents an item.
@@ -14,7 +13,7 @@ public class Item {
     private double itemPrice;
     private Date datePosted;
     private String username;
-    private String category;
+    int categoryId;
 
     /**
      * Class constructor
@@ -32,14 +31,13 @@ public class Item {
      * @param itemPrice The price of the item.
      * @param username The username of the item's creator.
      */
-    public Item(int itemId, String itemName, String itemDescription, Date datePosted, double itemPrice, String username, String category) {
+    public Item(int itemId, String itemName, String itemDescription, Date datePosted, double itemPrice, String username) {
         this.itemId = itemId;
         this.itemName = itemName;
         this.itemDescription = itemDescription;
         this.datePosted = datePosted;
         this.itemPrice = itemPrice;
         this.username = username;
-        this.category = category;
     }
 
     /**
@@ -82,11 +80,31 @@ public class Item {
         return username;
     }
 
-    public void setCategory(String category) {
-        this.category = category;
+    public void setCategoryId(int categoryId) {
+        this.categoryId = categoryId;
     }
 
-    public String getCategoryName() {
-        return category;
+    public void setItemId(int itemId) {
+        this.itemId = itemId;
+    }
+
+    public void setItemName(String itemName){
+        this.itemName = itemName;
+    }
+
+    public void setItemDescription(String itemDescription) {
+        this.itemDescription = itemDescription;
+    }
+
+    public void setItemPrice(double itemPrice) {
+        this.itemPrice = itemPrice;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public int getCategoryId() {
+        return categoryId;
     }
 }

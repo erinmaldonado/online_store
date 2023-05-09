@@ -2,16 +2,25 @@ package com.example.login;
 
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
 
 /**
  * This creates the tables to be used in the database.
  */
 public class CreateTables {
-    UserDatabase userDb = new UserDatabase();
-    ItemsDatabase itemsDb = new ItemsDatabase();
+    UserDatabase userDatabase = new UserDatabase();
+    ItemsDatabase itemsDatabase = new ItemsDatabase();
+    CategoriesDatabase categoriesDatabase = new CategoriesDatabase();
 
     CreateTables(){
+    }
+
+    public void dropTables(Statement statement) throws SQLException {
+        statement.execute("DROP TABLE IF EXISTS reviews");
+        statement.execute("DROP TABLE IF EXISTS item_categories");
+        statement.execute("DROP TABLE IF EXISTS items");
+        statement.execute("DROP TABLE IF EXISTS categories");
+        statement.execute("DROP TABLE IF EXISTS users");
     }
 
     public void create(){
@@ -20,12 +29,8 @@ public class CreateTables {
             createSchema.create();
             Connection connection = createSchema.getConnection();
             Statement statement = connection.createStatement();
-            statement.execute("DROP TABLE IF EXISTS reviews");
-            statement.execute("DROP TABLE IF EXISTS item_categories");
-            statement.execute("DROP TABLE IF EXISTS items");
-            statement.execute("DROP TABLE IF EXISTS categories");
-            statement.execute("DROP TABLE IF EXISTS users");
 
+            dropTables(statement);
 
             /**
              * Table for storing user information.
@@ -40,7 +45,6 @@ public class CreateTables {
                     + "UNIQUE KEY email (email)"
                     + ")";
             statement.executeUpdate(createUsersTable);
-
             /**
              * Table for storing category information.
              */
@@ -62,6 +66,8 @@ public class CreateTables {
                     + "username varchar(20) NOT NULL,"
                     + "FOREIGN KEY (username) REFERENCES users(username)"
                     + ")";
+
+
             statement.executeUpdate(createItemsTable);
 
             /**
@@ -90,6 +96,7 @@ public class CreateTables {
                     + "FOREIGN KEY (item_id) REFERENCES items(item_id),"
                     + "FOREIGN KEY (username) REFERENCES users(username)"
                     + ")";
+
             statement.executeUpdate(createReviewsTable);
 
             System.out.println("Tables created successfully.");
@@ -99,21 +106,59 @@ public class CreateTables {
         }
     }
 
+
     /**
      * dummy data to insert
      */
-    public void insertData(){
-        userDb.insertUser("username", "password","Errol","Cattenach","ecattenach0@cmu.edu");
-        userDb.insertUser("ecattenach0","rXIC75zfiC50","Errol","Cattenach","ecattenach0@cmu.edu");
-        userDb.insertUser("fgearing1","LWeMY5eXonk","Flossie","Gearing","fgearing1@furl.net");
-        userDb.insertUser("etommen2","xgObJl","Elli","Tommen","etommen2@istockphoto.com");
-        userDb.insertUser("tantognetti4","rPivA0y3x6jT","Trina","Antognetti","tantognetti4@digg.com");
+    public void insertData() {
+        String username1 = "username";
+        userDatabase.insertUser(username1, "password", "Erin", "Maldonado", "username@username.edu");
 
-        itemsDb.insertItem("Textbook","Proin eu mi. Nulla ac enim. In tempor, turpis nec euismod scelerisque, quam turpis adipiscing lorem, vitae mattis nibh ligula nec sem. Duis aliquam convallis nunc. Proin at turpis a pede posuere nonummy.",5.44,"tantognetti4",new String[]{"Books"});
-        itemsDb.insertItem("Macbook Pro","In eleifend quam a odio.",8.68,"etommen2",new String[]{"Computers"});
-        itemsDb.insertItem("Volleyball","Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Nulla dapibus dolor vel est. Donec odio justo, sollicitudin ut, suscipit a, feugiat et, eros. Vestibulum ac est lacinia nisi venenatis tristique. Fusce congue, diam id ornare imperdiet, sapien urna pretium nisl, ut volutpat sapien arcu sed augue.",7.46,"fgearing1",new String[]{"Sports"});
-        itemsDb.insertItem("Windshield wipers","Lorem ipsum dolor sit amet, consectetuer adipiscing elit.",19.99,"fgearing1",new String[]{"Automotive"});
-        itemsDb.insertItem("Set of plates","Lorem ipsum dolor sit amet, consectetuer adipiscing elit.",25.00,"tantognetti4",new String[]{"Home", "Decor"});
+        String username2 = "ecattenach0";
+        userDatabase.insertUser(username2, "rXIC75zfiC50", "Errol", "Cattenach", "ecattenach0@cmu.edu");
 
+        String username3 = "fgearing1";
+        userDatabase.insertUser(username3, "LWeMY5eXonk", "Flossie", "Gearing", "fgearing1@furl.net");
+
+        String username4 = "etommen2";
+        userDatabase.insertUser(username4, "xgObJl", "Elli", "Tommen", "etommen2@istockphoto.com");
+
+
+        String[] categoryNames = new String[]{"Electronics", "Gadgets", "Accessories", "Books", "Fiction", "Non-Fiction", "Automotive", "Home", "Garden"};
+        for (String categoryName : categoryNames) {
+            categoriesDatabase.insertCategory(categoryName);
+        }
+
+        // insert item 1
+        int itemId1 = itemsDatabase.insertItem("Item 1", "Description 1", 10.99, username1);
+        System.out.println("itemid: " + itemId1 + "/n");
+        itemsDatabase.insertItemCategories(itemId1, new String[]{"Electronics", "Gadgets"});
+
+        // insert item 2
+        int itemId2 = itemsDatabase.insertItem("Item 2", "Description 2", 15.99, username2);
+        System.out.println("itemid2: " + itemId2 + "/n");
+        itemsDatabase.insertItemCategories(itemId2, new String[]{"Electronics", "Accessories"});
+
+        // insert item 3
+        int itemId3 = itemsDatabase.insertItem("Item 3", "Description 3", 20.99, username3);
+        System.out.println("itemid3: " + itemId3 + "/n");
+        itemsDatabase.insertItemCategories(itemId3, new String[]{"Books", "Fiction"});
+
+
+        // insert item 4
+        int itemId4 = itemsDatabase.insertItem("Item 4", "Description 4", 25.99, username4);
+        System.out.println("itemid4: " + itemId4 + "/n");
+        itemsDatabase.insertItemCategories(itemId4, new String[]{"Books", "Non-Fiction"});
+
+
+        // insert item 5
+        int itemId5 = itemsDatabase.insertItem("Item 5", "Description 5", 50.99, username4);
+        System.out.println("itemid5: " + itemId5);
+        itemsDatabase.insertItemCategories(itemId5, new String[]{"Automotive", "Accessories"});
+
+        //insert item 6
+        int itemId6 = itemsDatabase.insertItem("Item 6", "Description 6", 1999.99, username4);
+        System.out.println("itemid6: " + itemId6);
+        itemsDatabase.insertItemCategories(itemId5, new String[]{"Home", "Garden"});
     }
 }

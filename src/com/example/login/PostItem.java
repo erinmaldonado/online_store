@@ -29,12 +29,14 @@ public class PostItem {
 			if (itemsPostedToday < 3) {
 				String titleFieldText = titleField.getText();
 				String descriptionTextAreaText = descriptionTextArea.getText();
-				String[] categoryFieldText = categoryField.getText().split(","); // Change this line
+				String[] categoryFieldText = categoryField.getText().split(",");
 
 				try {
 					double priceFieldText = Double.parseDouble(priceField.getText());
 
-					itemsDatabase.insertItem(titleFieldText, descriptionTextAreaText, priceFieldText, currentUsername, categoryFieldText);
+					int itemId = itemsDatabase.insertItem(titleFieldText, descriptionTextAreaText, priceFieldText, currentUsername);
+					itemsDatabase.insertItemCategories(itemId, categoryFieldText);
+
 					JOptionPane.showMessageDialog(null, "Item posted.");
 					// go back to user options page
 					JFrame userOptionsFrame = new UserOptionsFrame(currentUser);
@@ -60,7 +62,6 @@ public class PostItem {
 	}
 
 	private void createUIComponents() {
-		// Set the preferred number of rows and columns for the description box
 		descriptionTextArea = new JTextArea(10, 30); // 10 rows and 30 columns
 	}
 }

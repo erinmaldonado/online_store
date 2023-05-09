@@ -1,9 +1,9 @@
 package com.example.login;
 
 public class Review {
-    private String username;
-    private String rating;
-    private String description;
+    private final String username;
+    private final String rating;
+    private final String description;
 
     public Review(String username, String rating, String description) {
         this.username = username;

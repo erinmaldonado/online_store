@@ -2,7 +2,7 @@ package com.example.login;
 
 import java.sql.*;
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.Calendar;
 import java.util.List;
 
 /**
@@ -17,107 +17,56 @@ public class ItemsDatabase {
      * @param description
      * @param price
      * @param username
-     * @param categoryNames
      */
-    public void insertItem(String title, String description, double price, String username, String[] categoryNames) {
-        String query = "INSERT INTO items (title, description, price, username, date_posted) VALUES (?, ?, ?, ?, ?)";
+    public int insertItem(String title, String description, double price, String username) {
+        String query = "INSERT INTO items (title, description, date_posted, price, username) VALUES (?, ?, ?, ?, ?)";
+
+        int itemId = -1;
 
         try (Connection connection = DBConnection.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(query, Statement.RETURN_GENERATED_KEYS)) {
+
+            java.sql.Date date = new java.sql.Date(Calendar.getInstance().getTime().getTime());
 
             preparedStatement.setString(1, title);
             preparedStatement.setString(2, description);
-            preparedStatement.setDouble(3, price);
-            preparedStatement.setString(4, username);
-            preparedStatement.setDate(5, new java.sql.Date(System.currentTimeMillis()));
+            preparedStatement.setDate(3, date);
+            preparedStatement.setDouble(4, price);
+            preparedStatement.setString(5, username);
 
             preparedStatement.executeUpdate();
-
-            ResultSet rs = preparedStatement.getGeneratedKeys();
-            if (rs.next()) {
-                int itemId = rs.getInt(1);
-
-                for (String categoryName : categoryNames) {
-                    int categoryId = getCategoryId(categoryName.trim());
-                    insertItemCategory(itemId, categoryId);
-                }
+            ResultSet generatedKeys = preparedStatement.getGeneratedKeys();
+            if (generatedKeys.next()) {
+                itemId = generatedKeys.getInt(1);
             }
-
+            generatedKeys.close();
         } catch (SQLException e) {
             e.printStackTrace();
         }
+        return itemId;
     }
 
-
-    /**
-     * @param categoryName
-     * @return
-     */
-    public int getCategoryId(String categoryName) {
-        String query = "SELECT category_id FROM categories WHERE name = ?";
-
-        try (Connection connection = DBConnection.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(query)) {
-
-            preparedStatement.setString(1, categoryName);
-
-            ResultSet rs = preparedStatement.executeQuery();
-            if (rs.next()) {
-                return rs.getInt("category_id");
-            } else {
-                return insertCategory(categoryName);
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-            return -1;
-        }
-    }
-
-    /**
-     * @param categoryName
-     * @return
-     */
-    public int insertCategory(String categoryName) {
-        String query = "INSERT INTO categories (name) VALUES (?)";
-
-        try (Connection connection = DBConnection.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(query, Statement.RETURN_GENERATED_KEYS)) {
-
-            preparedStatement.setString(1, categoryName);
-
-            preparedStatement.executeUpdate();
-
-            ResultSet rs = preparedStatement.getGeneratedKeys();
-            if (rs.next()) {
-                return rs.getInt(1);
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-
-        return -1;
-    }
-
-    /**
-     * @param itemId
-     * @param categoryId
-     */
-    public void insertItemCategory(int itemId, int categoryId) {
+    public void insertItemCategories(int itemId, String[] categoryNames) {
         String query = "INSERT INTO item_categories (item_id, category_id) VALUES (?, ?)";
+        CategoriesDatabase categoriesDatabase = new CategoriesDatabase();
 
-        try (Connection connection = DBConnection.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+        for (String categoryName : categoryNames) {
+            try (Connection connection = DBConnection.getConnection();
+                 PreparedStatement preparedStatement = connection.prepareStatement(query)) {
 
-            preparedStatement.setInt(1, itemId);
-            preparedStatement.setInt(2, categoryId);
+                int categoryId = categoriesDatabase.insertCategory(categoryName);
 
-            preparedStatement.executeUpdate();
+                System.out.println("Category name: " + categoryName);
+                System.out.println("Category ID: " + categoryId);
 
-        } catch (SQLException e) {
-            e.printStackTrace();
+                preparedStatement.setInt(1, itemId);
+                preparedStatement.setInt(2, categoryId);
+                preparedStatement.executeUpdate();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
         }
     }
-
 
     /**
      * @param username
@@ -163,7 +112,6 @@ public class ItemsDatabase {
             preparedStatement.setString(1, category);
             resultSet = preparedStatement.executeQuery();
 
-            // Extract the data from the ResultSet
             getResults(items, resultSet);
         } catch (Exception e) {
             e.printStackTrace();
@@ -206,67 +154,46 @@ public class ItemsDatabase {
         } catch (SQLException e) {
             e.printStackTrace();
         }
-
         return items;
     }
 
 
     public List<Item> getMostExpensiveItemsInEachCategory() {
         List<Item> mostExpensiveItems = new ArrayList<>();
-        String query = "WITH ranked_items AS ( " +
-                "SELECT i.item_id, i.title, i.description, i.price, i.username, i.date_posted, c.name, " +
-                "       ROW_NUMBER() OVER (PARTITION BY c.category_id ORDER BY i.price DESC) AS row_num " +
-                "FROM items i " +
-                "JOIN item_categories ic ON i.item_id = ic.item_id " +
-                "JOIN categories c ON c.category_id = ic.category_id " +
-                ") " +
-                "SELECT item_id, title, description, price, username, date_posted, name " +
-                "FROM ranked_items " +
-                "WHERE row_num = 1;";
+        String query = "SELECT items.*, categories.category_id, categories.name AS category_name " +
+                "FROM items " +
+                "JOIN item_categories ON items.item_id = item_categories.item_id " +
+                "JOIN categories ON item_categories.category_id = categories.category_id " +
+                "WHERE (categories.category_id, items.price) IN " +
+                "(SELECT item_categories.category_id, MAX(items.price) FROM items JOIN item_categories ON items.item_id = item_categories.item_id GROUP BY item_categories.category_id) " +
+                "ORDER BY categories.name";
 
         try (Connection connection = DBConnection.getConnection();
-             PreparedStatement stmt = connection.prepareStatement(query)) {
-            ResultSet rs = stmt.executeQuery();
+             PreparedStatement preparedStatement = connection.prepareStatement(query)) {
 
-            while (rs.next()) {
-                int itemId = rs.getInt("item_id");
-                String title = rs.getString("title");
-                String description = rs.getString("description");
-                Date datePosted = rs.getDate("date_posted");
-                double price = rs.getDouble("price");
-                String username = rs.getString("username");
-                String category = rs.getString("name");
+            ResultSet resultSet = preparedStatement.executeQuery();
+            while (resultSet.next()) {
+                Item item = new Item();
+                item.setItemId(resultSet.getInt("item_id"));
+                item.setItemName(resultSet.getString("title"));
+                item.setItemDescription(resultSet.getString("description"));
+                item.setItemPrice(resultSet.getDouble("price"));
+                item.setCategoryId(resultSet.getInt("category_id"));
+                item.setUsername(resultSet.getString("username"));
 
-                Item item = new Item(itemId, title, description, datePosted, price, username, category);
                 mostExpensiveItems.add(item);
             }
         } catch (SQLException e) {
             e.printStackTrace();
         }
-
         return mostExpensiveItems;
     }
 
-    public String getCategory(int categoryId) {
-        String query = "SELECT name FROM categories WHERE category_id = ?";
-
-        try (Connection connection = DBConnection.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(query)) {
-
-            preparedStatement.setInt(1, categoryId);
-
-            ResultSet rs = preparedStatement.executeQuery();
-            if (rs.next()) {
-                return rs.getString("name");
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-
-        return null;
+    private void getItems(List<Item> itemsList, ResultSet rs) throws SQLException {
+        getItemInfo(itemsList, rs);
     }
 
-    private void getItems(List<Item> itemsList, ResultSet rs) throws SQLException {
+    private void getItemInfo(List<Item> itemsList, ResultSet rs) throws SQLException {
         while (rs.next()) {
             int itemId = rs.getInt("item_id");
             String title = rs.getString("title");
@@ -274,40 +201,10 @@ public class ItemsDatabase {
             Date datePosted = rs.getDate("date_posted");
             double price = rs.getDouble("price");
             String username = rs.getString("username");
-            String category = getCategory(itemId); // Get the category from the ResultSet
 
-            Item item = new Item(itemId, title, description, datePosted, price, username, category);
+
+            Item item = new Item(itemId, title, description, datePosted, price, username);
             itemsList.add(item);
         }
     }
-
-    public List<String> getUsersWithItemsInCategoriesOnSameDay(String categoryX, String categoryY) {
-        List<String> users = new ArrayList<>();
-        String query = "SELECT i1.username " +
-                "FROM items i1 " +
-                "JOIN item_categories ic1 ON i1.item_id = ic1.item_id " +
-                "JOIN categories c1 ON ic1.category_id = c1.category_id " +
-                "JOIN items i2 ON i1.username = i2.username AND DATE(i1.date_posted) = DATE(i2.date_posted) " +
-                "JOIN item_categories ic2 ON i2.item_id = ic2.item_id " +
-                "JOIN categories c2 ON ic2.category_id = c2.category_id " +
-                "WHERE c1.name = ? AND c2.name = ? AND i1.item_id <> i2.item_id " +
-                "GROUP BY i1.username;";
-
-        try (Connection connection = DBConnection.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(query)) {
-
-            preparedStatement.setString(1, categoryX);
-            preparedStatement.setString(2, categoryY);
-
-            ResultSet rs = preparedStatement.executeQuery();
-            while (rs.next()) {
-                users.add(rs.getString("username"));
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-
-        return users;
-    }
-
 }

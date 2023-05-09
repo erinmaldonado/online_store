@@ -47,16 +47,16 @@ public class UserOptions {
             JFrame searchResultFrame = new JFrame("Search Results");
             searchResultFrame.setSize(500, 500);
             searchResultFrame.setLocationRelativeTo(null);
-
-            // Create a JTable with column names and the retrieved items
             String[] columnNames = {"ID", "Name", "Description", "Price"};
             Object[][] data = new Object[items.size()][5];
-            for (int i = 0; i < items.size(); i++) {
-                Item item = items.get(i);
-                data[i][0] = item.getItemId();
-                data[i][1] = item.getItemName();
-                data[i][2] = item.getItemDescription();
-                data[i][3] = "$"+item.getItemPrice();
+            if (!items.isEmpty()) {
+                for (int i = 0; i < items.size(); i++) {
+                    Item item = items.get(i);
+                    data[i][0] = item.getItemId();
+                    data[i][1] = item.getItemName();
+                    data[i][2] = item.getItemDescription();
+                    data[i][3] = "$" + item.getItemPrice();
+                }
             }
 
             DefaultTableModel tableModel = new DefaultTableModel(data, columnNames) {
@@ -74,47 +74,49 @@ public class UserOptions {
 
         mostExpensiveInCategoryButton.addActionListener(e -> {
             ItemsDatabase itemsDatabase = new ItemsDatabase();
-            List<Item> mostExpensiveItems = itemsDatabase.getMostExpensiveItemsInEachCategory();
+            CategoriesDatabase categoriesDatabase = new CategoriesDatabase();
 
             JFrame frame = new JFrame("Most Expensive Items in Each Category");
-            frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
             frame.setSize(800, 400);
             frame.setLocationRelativeTo(null);
 
-            if (!mostExpensiveItems.isEmpty()) {
-                String[] columnNames = {"Item ID", "Title", "Description", "Price", "Username", "Category"};
-                Object[][] data = new Object[mostExpensiveItems.size()][6];
+            List<Item> mostExpensiveItems = itemsDatabase.getMostExpensiveItemsInEachCategory();
 
+            Object[][] data = new Object[mostExpensiveItems.size()][6];
+            String[] columnNames = {"Category", "Item ID", "Title", "Description", "Price", "Username"};
+
+            if (!mostExpensiveItems.isEmpty()) {
                 for (int i = 0; i < mostExpensiveItems.size(); i++) {
                     Item item = mostExpensiveItems.get(i);
-                    data[i][0] = item.getItemId();
-                    data[i][1] = item.getItemName();
-                    data[i][2] = item.getItemDescription();
-                    data[i][3] = String.format("$%.2f", item.getItemPrice());
-                    data[i][4] = item.getUsername();
-                    data[i][5] = item.getCategoryName();
+                    int categoryId = item.getCategoryId();
+
+                    data[i][0] = categoriesDatabase.getCategoryName(categoryId);
+                    data[i][1] = item.getItemId();
+                    data[i][2] = item.getItemName();
+                    data[i][3] = item.getItemDescription();
+                    data[i][4] = String.format("$%.2f", item.getItemPrice());
+                    data[i][5] = item.getUsername();
                 }
 
-                DefaultTableModel tableModel = new DefaultTableModel(data, columnNames) {
-                    @Override
-                    public boolean isCellEditable(int row, int column) {
-                        return false; // Make all cells non-editable
-                    }
-                };
-
-                JTable table = new JTable(tableModel);
+                JTable table = new JTable(data, columnNames);
                 JScrollPane scrollPane = new JScrollPane(table);
-                frame.getContentPane().add(scrollPane, BorderLayout.CENTER);
+                frame.add(scrollPane);
+                frame.pack();
+                frame.setVisible(true);
+
             } else {
-                JOptionPane.showMessageDialog(null, "No items found in the categories.", "No items.", JOptionPane.INFORMATION_MESSAGE);
+                System.out.println("No items found");
             }
-            frame.setVisible(true);
+        });
+
+        usersTwoItemsButton.addActionListener(e->{
+            JFrame enterUserFrame = new EnterCategoriesFrame();
+            enterUserFrame.setVisible(true);
+            SwingUtilities.getWindowAncestor(postButton).dispose();
+
         });
 
         /*
-        usersTwoItemsButton.addActionListener(e->{
-
-        });
 
         userXExcellentButton.addActionListener(e->{
 

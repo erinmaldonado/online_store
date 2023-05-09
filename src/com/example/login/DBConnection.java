@@ -8,8 +8,8 @@ import java.sql.*;
  * @author Erin Maldonado
  */
 public class DBConnection {
-	static String DB_URL = "jdbc:mysql://localhost:3306/";;
-	static String DB_USER = "root";
+	static String DB_URL = "jdbc:mysql://localhost:3306/";
+    static String DB_USER = "root";
 	static String DB_PASS = "password";
 	static String dbName = "ONLINE_STORE";
 
