@@ -2,7 +2,6 @@ package com.example.login;
 
 import java.sql.*;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.List;
 
 /**
@@ -18,15 +17,14 @@ public class ItemsDatabase {
      * @param itemPrice
      * @param username
      */
-    public int insertItem(String itemName, String itemDescription, double itemPrice, String username) {
+    public int insertItem(String itemName, String itemDescription, java.sql.Date datePosted,
+    double itemPrice, String username) {
         String query = "INSERT INTO items (item_name, item_description, date_posted, item_price, username) VALUES (?, ?, ?, ?, ?)";
 
         int itemId = -1;
 
         try (Connection connection = DBConnection.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(query, Statement.RETURN_GENERATED_KEYS)) {
-
-            java.sql.Date datePosted = new java.sql.Date(Calendar.getInstance().getTime().getTime());
 
             preparedStatement.setString(1, itemName);
             preparedStatement.setString(2, itemDescription);
@@ -195,5 +193,51 @@ public class ItemsDatabase {
             e.printStackTrace();
         }
         return mostExpensiveItems;
+    }
+
+    public List<Item> getUsersByTwoCategoriesSameDay(String categoryX, String categoryY) {
+        List<Item> userItems = new ArrayList<>();
+
+        String query = "SELECT items.item_id, items.username, items.item_name AS itemName, items.item_description AS itemDescription, items.item_price AS itemPrice, " +
+                "categories.category_name AS categoryName, DATE(items.date_posted) AS datePosted " +
+                "FROM items " +
+                "JOIN item_categories ON items.item_id = item_categories.item_id " +
+                "JOIN categories ON item_categories.category_id = categories.category_id " +
+                "WHERE categories.category_name IN (?, ?) " +
+                "AND items.username IN (" +
+                "SELECT i1.username " +
+                "FROM items i1 " +
+                "JOIN item_categories ic1 ON i1.item_id = ic1.item_id " +
+                "JOIN categories c1 ON ic1.category_id = c1.category_id " +
+                "JOIN items i2 ON i1.username = i2.username AND DATE(i1.date_posted) = DATE(i2.date_posted) " +
+                "JOIN item_categories ic2 ON i2.item_id = ic2.item_id " +
+                "JOIN categories c2 ON ic2.category_id = c2.category_id " +
+                "WHERE c1.category_name = ? AND c2.category_name = ? AND i1.item_id <> i2.item_id" +
+                ")";
+
+        try (Connection connection = DBConnection.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+            preparedStatement.setString(1, categoryX);
+            preparedStatement.setString(2, categoryY);
+            preparedStatement.setString(3, categoryX);
+            preparedStatement.setString(4, categoryY);
+
+            ResultSet resultSet = preparedStatement.executeQuery();
+            while (resultSet.next()) {
+                Item item = new Item();
+                item.setItemId(resultSet.getInt("item_id"));
+                item.setUsername(resultSet.getString("username"));
+                item.setItemName(resultSet.getString("itemName"));
+                item.setItemDescription(resultSet.getString("itemDescription"));
+                item.setItemPrice(resultSet.getDouble("itemPrice"));
+                item.setCategoryName(resultSet.getString("categoryName"));
+                item.setDatePosted(resultSet.getDate("datePosted"));
+                userItems.add(item);
+            }
+            resultSet.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return userItems;
     }
 }

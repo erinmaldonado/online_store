@@ -1,11 +1,14 @@
 package com.example.login;
 
+import java.util.List;
+
 public class User {
 	private String username;
 	private String password;
 	private String firstName;
 	private String lastName;
 	private String email;
+	private List<Item> itemList;
 
 	User(){
 
@@ -45,4 +48,11 @@ public class User {
 		return email;
 	}
 
+	public List<Item> getItemList(){
+		return itemList;
+	}
+
+	public void setUserItems(List<Item> itemList){
+		this.itemList = itemList;
+	}
 }

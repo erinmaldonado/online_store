@@ -14,9 +14,12 @@ public class Item {
     private double itemPrice;
     private Date datePosted;
     private String username;
-    private int categoryId;
     private String categoryName;
     private List<String> categoriesList;
+
+
+    private String categoryNameX;
+    private String categoryNameY;
 
     /**
      * Class constructor
@@ -94,7 +97,17 @@ public class Item {
 
     public List<String> getCategoryNames() {
         return categoriesList;
-    } // End Getters
+    }
+
+    public String getCategoryNameX(){
+        return categoryNameX;
+    }
+
+    public String getCategoryNameY(){
+        return categoryNameY;
+    }
+
+    // End Getters
 
 
     // Beginning Setters
@@ -125,16 +138,19 @@ public class Item {
         this.username = username;
     }
 
-    public void setCategoryId(int categoryId) {
-        this.categoryId = categoryId;
-    }
-
     public void setCategoryName(String categoryName){
         this.categoryName = categoryName;
     }
 
     public void setCategoryNames(List<String> categoriesList) {
         this.categoriesList = categoriesList;
+    }
+
+    public void setCategoryNameX(String categoryNameX) {
+        this.categoryNameX = categoryNameX;
+    }
+    public void setCategoryNameY(String categoryNameY) {
+        this.categoryNameY = categoryNameY;
     }
 
 // End Setters
@@ -149,7 +165,6 @@ public class Item {
                 "Item Price: " + itemPrice + "\n" +
                 "Date Posted: " + datePosted + "\n" +
                 "Username: " + username + "\n" +
-                "Category id: " + categoryId + "\n" +
                 "Category Name: " + categoryName + "\n" +
                 "Categories List: " + categoriesList;
     }

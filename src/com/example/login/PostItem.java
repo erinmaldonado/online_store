@@ -3,6 +3,8 @@ package com.example.login;
 import javax.swing.*;
 
 import java.awt.*;
+import java.sql.Date;
+import java.util.Calendar;
 
 import static javax.swing.SwingUtilities.getWindowAncestor;
 
@@ -33,8 +35,9 @@ public class PostItem {
 
 				try {
 					double priceFieldText = Double.parseDouble(priceField.getText());
-
-					int itemId = itemsDatabase.insertItem(titleFieldText, descriptionTextAreaText, priceFieldText, currentUsername);
+					// Current date
+					Date currentDate = new java.sql.Date(Calendar.getInstance().getTime().getTime());
+					int itemId = itemsDatabase.insertItem(titleFieldText, descriptionTextAreaText, currentDate, priceFieldText, currentUsername);
 					itemsDatabase.insertItemCategories(itemId, categoryFieldText);
 
 					JOptionPane.showMessageDialog(null, "Item posted.");

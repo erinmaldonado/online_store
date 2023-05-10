@@ -3,6 +3,9 @@ package com.example.login;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.List;
 
 /**
  * This creates the tables to be used in the database.
@@ -108,54 +111,82 @@ public class CreateTables {
      * dummy data to insert
      */
     public void insertData() {
-        String username1 = "username";
-        userDatabase.insertUser(username1, "password", "Erin", "Maldonado", "username@username.edu");
-
-        String username2 = "ecattenach0";
-        userDatabase.insertUser(username2, "rXIC75zfiC50", "Errol", "Cattenach", "ecattenach0@cmu.edu");
-
-        String username3 = "fgearing1";
-        userDatabase.insertUser(username3, "LWeMY5eXonk", "Flossie", "Gearing", "fgearing1@furl.net");
-
-        String username4 = "etommen2";
-        userDatabase.insertUser(username4, "xgObJl", "Elli", "Tommen", "etommen2@istockphoto.com");
-
-
+        // Add categories
         String[] categoryNames = new String[]{"Electronics", "Gadgets", "Accessories", "Books", "Fiction", "Non-Fiction", "Automotive", "Home", "Garden"};
 
         for (String categoryName : categoryNames) {
             categoriesDatabase.insertCategory(categoryName);
         }
 
-        // User 1: username
-        // insert item 1
-        int itemId1 = itemsDatabase.insertItem("Item 1", "Description 1", 10.99, username1);
+        // Current date
+        Date datePosted = new java.sql.Date(Calendar.getInstance().getTime().getTime());
+        Date previousDatePosted = new Date(01/01/2020);
+
+        // User #1
+        String username = "username";
+        String password = "password";
+        String firstName = "Erin";
+        String lastName = "Maldonado";
+        String email = "erin@gmail.com";
+        User user = new User(username, password, firstName, lastName, email);
+        userDatabase.insertUser(user);
+
+        // User 1: item 1
+        int itemId1 = itemsDatabase.insertItem("Item 1", "Description 1", datePosted, 10.99, username);
         itemsDatabase.insertItemCategories(itemId1, new String[]{"Electronics", "Gadgets"});
 
-        // User 2: ecattenach0
-        // insert item 2
-        int itemId2 = itemsDatabase.insertItem("Item 2", "Description 2", 15.99, username2);
+        userDatabase.loadUserItems(user);
+
+        // User #2
+        username = "username2";
+        password = "pw2";
+        firstName = "First2";
+        lastName = "Last2";
+        email = "username2@gmail.com";
+        user = new User(username, password, firstName, lastName, email);
+        userDatabase.insertUser(user);
+
+        // User 2: item 3
+        int itemId2 = itemsDatabase.insertItem("Item 2", "Description 2", previousDatePosted, 15.99, username);
         itemsDatabase.insertItemCategories(itemId2, new String[]{"Electronics", "Accessories"});
+        userDatabase.loadUserItems(user);
 
-        // User 3: fgearing1
-        // insert item 3
-        int itemId3 = itemsDatabase.insertItem("Item 3", "Description 3", 20.99, username3);
+        // User #3
+        username = "username3";
+        password = "pw3";
+        firstName = "First3";
+        lastName = "Last3";
+        email = "username3@gmail.com";
+        user = new User(username, password, firstName, lastName, email);
+        userDatabase.insertUser(user);
+
+        // User 3: item 3
+        int itemId3 = itemsDatabase.insertItem("Item 3", "Description 3", previousDatePosted, 20.99, username);
         itemsDatabase.insertItemCategories(itemId3, new String[]{"Books", "Fiction"});
+        userDatabase.loadUserItems(user);
 
-        // User 4: etommen2
-        // insert item 4
-        int itemId4 = itemsDatabase.insertItem("Item 4", "Description 4", 25.99, username4);
+        // User #4
+        username = "username4";
+        password = "pw4";
+        firstName = "First4";
+        lastName = "Last4";
+        email = "username4@gmail.com";
+        user = new User(username, password, firstName, lastName, email);
+        userDatabase.insertUser(user);
+
+        // User 4: item 4
+        int itemId4 = itemsDatabase.insertItem("Item 4", "Description 4", datePosted, 25.99, username);
         itemsDatabase.insertItemCategories(itemId4, new String[]{"Books", "Non-Fiction"});
 
-
-        // insert item 5
-        int itemId5 = itemsDatabase.insertItem("Item 5", "Description 5", 50.99, username4);
+        // User 4: item 5
+        int itemId5 = itemsDatabase.insertItem("Item 5", "Description 5", datePosted, 50.99, username);
         itemsDatabase.insertItemCategories(itemId5, new String[]{"Automotive", "Accessories"});
 
-        //insert item 6
-        int itemId6 = itemsDatabase.insertItem("Item 6", "Description 6", 1999.99, username4);
-        itemsDatabase.insertItemCategories(itemId6, new String[]{"Home", "Accessories"});
 
-        itemsDatabase.toString();
+        // User 4: item 6
+        int itemId6 = itemsDatabase.insertItem("Item 6", "Description 6", datePosted, 1999.99, username);
+        itemsDatabase.insertItemCategories(itemId6, new String[]{"Home", "Garden"});
+
+        userDatabase.loadUserItems(user);
     }
 }

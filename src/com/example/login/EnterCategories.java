@@ -19,17 +19,17 @@ public class EnterCategories {
             frame.setSize(800, 400);
             frame.setLocationRelativeTo(null);
 
-            UserDatabase userDatabase = new UserDatabase();
+            ItemsDatabase itemsDatabase = new ItemsDatabase();
             String categoryX = category1TextField.getText();
             String categoryY = category2TextField.getText();
 
-            List<Item> items = userDatabase.getUsersByTwoCategoriesSameDay(categoryX, categoryY);
+            List<Item> items = itemsDatabase.getUsersByTwoCategoriesSameDay(categoryX, categoryY);
 
             JFrame searchResultFrame = new JFrame("Users who posted at least two items on the same day");
             searchResultFrame.setSize(800, 500);
             searchResultFrame.setLocationRelativeTo(null);
 
-            String[] columnNames = {"Category", "ID", "Name", "Description", "Username", "Date Posted", "Price"};
+            String[] columnNames = {"Category", "ID", "Name", "Description", "Username", "Price", "Date Posted"};
             Object[][] data = new Object[items.size()][7];
             if (!items.isEmpty()) {
                 for (int i = 0; i < items.size(); i++) {
