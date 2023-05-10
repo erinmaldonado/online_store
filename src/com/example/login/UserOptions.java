@@ -47,8 +47,8 @@ public class UserOptions {
             JFrame searchResultFrame = new JFrame("Search Results");
             searchResultFrame.setSize(500, 500);
             searchResultFrame.setLocationRelativeTo(null);
-            String[] columnNames = {"ID", "Name", "Description", "Price"};
-            Object[][] data = new Object[items.size()][5];
+            String[] columnNames = {"ID", "Name", "Description", "Price", "Categories", "Username", "Date Posted"};
+            Object[][] data = new Object[items.size()][7];
             if (!items.isEmpty()) {
                 for (int i = 0; i < items.size(); i++) {
                     Item item = items.get(i);
@@ -56,6 +56,9 @@ public class UserOptions {
                     data[i][1] = item.getItemName();
                     data[i][2] = item.getItemDescription();
                     data[i][3] = "$" + item.getItemPrice();
+                    data[i][4] = item.getCategoryNames();
+                    data[i][5] = item.getUsername();
+                    data[i][6] = item.getDatePosted();
                 }
             }
 
@@ -73,40 +76,40 @@ public class UserOptions {
         });
 
         mostExpensiveInCategoryButton.addActionListener(e -> {
-            ItemsDatabase itemsDatabase = new ItemsDatabase();
-            CategoriesDatabase categoriesDatabase = new CategoriesDatabase();
+            ItemsDatabase itemsDb = new ItemsDatabase();
+            List<Item> items = itemsDb.getMostExpensiveItemsInEachCategory();
 
-            JFrame frame = new JFrame("Most Expensive Items in Each Category");
-            frame.setSize(800, 400);
-            frame.setLocationRelativeTo(null);
+            JFrame searchResultFrame = new JFrame("Most Expensive Items in Each Category");
+            searchResultFrame.setSize(800, 500);
+            searchResultFrame.setLocationRelativeTo(null);
 
-            List<Item> mostExpensiveItems = itemsDatabase.getMostExpensiveItemsInEachCategory();
+            String[] columnNames = {"Category", "ID", "Name", "Description", "Username", "Date Posted", "Price"};
+            Object[][] data = new Object[items.size()][7];
+            if (!items.isEmpty()) {
+                for (int i = 0; i < items.size(); i++) {
+                    Item item = items.get(i);
 
-            Object[][] data = new Object[mostExpensiveItems.size()][6];
-            String[] columnNames = {"Category", "Item ID", "Title", "Description", "Price", "Username"};
-
-            if (!mostExpensiveItems.isEmpty()) {
-                for (int i = 0; i < mostExpensiveItems.size(); i++) {
-                    Item item = mostExpensiveItems.get(i);
-                    int categoryId = item.getCategoryId();
-
-                    data[i][0] = categoriesDatabase.getCategoryName(categoryId);
+                    data[i][0] = item.getCategoryName();
                     data[i][1] = item.getItemId();
                     data[i][2] = item.getItemName();
                     data[i][3] = item.getItemDescription();
-                    data[i][4] = String.format("$%.2f", item.getItemPrice());
-                    data[i][5] = item.getUsername();
+                    data[i][4] = item.getUsername();
+                    data[i][5] = "$" + item.getItemPrice();
+                    data[i][6] = item.getDatePosted();
                 }
-
-                JTable table = new JTable(data, columnNames);
-                JScrollPane scrollPane = new JScrollPane(table);
-                frame.add(scrollPane);
-                frame.pack();
-                frame.setVisible(true);
-
-            } else {
-                System.out.println("No items found");
             }
+
+            DefaultTableModel tableModel = new DefaultTableModel(data, columnNames) {
+                @Override
+                public boolean isCellEditable(int row, int column) {
+                    return false; // Make all cells non-editable
+                }
+            };
+
+            JTable table = new JTable(tableModel);
+            JScrollPane scrollPane = new JScrollPane(table);
+            searchResultFrame.getContentPane().add(scrollPane);
+            searchResultFrame.setVisible(true);
         });
 
         usersTwoItemsButton.addActionListener(e->{

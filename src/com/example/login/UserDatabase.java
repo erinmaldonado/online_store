@@ -18,7 +18,6 @@ public class UserDatabase {
 			} else {
 				String query = "INSERT INTO users (username, password, firstName, lastName, email) VALUES (?, ?, ?, ?, ?)";
 				PreparedStatement insertStmt = conn.prepareStatement(query);
-					System.out.println("username: " + username);
 					insertStmt.setString(1, username);
 					insertStmt.setString(2, password);
 					insertStmt.setString(3, firstName);
@@ -74,52 +73,31 @@ public class UserDatabase {
 		return null;
 	}
 
-	public List<UserItems> getUsersByTwoCategoriesSameDay(String categoryX, String categoryY) {
-		List<UserItems> userItemInfos = new ArrayList<>();
-		String query = "SELECT i1.username, i1.categoryName, i1.itemName, DATE(i1.postingDate) as postingDate " +
+	public List<Item> getUsersByTwoCategoriesSameDay(String categoryX, String categoryY) {
+		List<Item> userItems = new ArrayList<>();
+		ItemsDatabase itemsDatabase = new ItemsDatabase();
+
+		String query = "SELECT i1.item_id, i1.username, i1.item_name AS itemName, i1.item_description AS itemDescription, i1.item_price AS itemPrice, c1.category_name AS categoryName, DATE(i1.date_posted) AS datePosted " +
 				"FROM items i1 " +
-				"JOIN items i2 ON i1.username = i2.username AND DATE(i1.postingDate) = DATE(i2.postingDate) " +
-				"WHERE i1.categoryName = ? AND i2.categoryName = ? " +
-				"AND i1.itemId <> i2.itemId " +
-				"GROUP BY i1.username, i1.categoryName, i1.itemName, DATE(i1.postingDate)";
+				"JOIN item_categories ic1 ON i1.item_id = ic1.item_id " +
+				"JOIN categories c1 ON ic1.category_id = c1.category_id " +
+				"JOIN items i2 ON i1.username = i2.username AND DATE(i1.date_posted) = DATE(i2.date_posted) " +
+				"JOIN item_categories ic2 ON i2.item_id = ic2.item_id " +
+				"JOIN categories c2 ON ic2.category_id = c2.category_id " +
+				"WHERE c1.category_name = ? AND c2.category_name = ? AND i1.item_id <> i2.item_id " +
+				"GROUP BY i1.item_id, i1.username, i1.item_name, i1.item_description, i1.item_price, c1.category_name, DATE(i1.date_posted)";
+
 		try (Connection connection = DBConnection.getConnection();
 			 PreparedStatement preparedStatement = connection.prepareStatement(query)) {
 			preparedStatement.setString(1, categoryX);
 			preparedStatement.setString(2, categoryY);
 
 			ResultSet resultSet = preparedStatement.executeQuery();
-			while (resultSet.next()) {
-				UserItems userItemInfo = new UserItems(resultSet.getString("username"),
-						resultSet.getString("categoryName"),
-						resultSet.getString("itemName"),
-						resultSet.getDate("postingDate").toLocalDate());
-				userItemInfos.add(userItemInfo);
-			}
+			itemsDatabase.setItemInfo(userItems, resultSet);
 			resultSet.close();
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-		return userItemInfos;
-	}
-
-	public boolean usernameExists(String username) {
-		String query = "SELECT COUNT(*) FROM users WHERE username = ?";
-		int count = 0;
-
-		try (Connection connection = DBConnection.getConnection();
-			 PreparedStatement preparedStatement = connection.prepareStatement(query)) {
-
-			preparedStatement.setString(1, username);
-			ResultSet resultSet = preparedStatement.executeQuery();
-
-			if (resultSet.next()) {
-				count = resultSet.getInt(1);
-			}
-			resultSet.close();
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
-
-		return count > 0;
+		return userItems;
 	}
 }

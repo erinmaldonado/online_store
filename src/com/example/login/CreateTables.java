@@ -50,7 +50,7 @@ public class CreateTables {
              */
             String createCategoriesTable = "CREATE TABLE categories ("
                     + "category_id INT AUTO_INCREMENT PRIMARY KEY,"
-                    + "name VARCHAR(255) UNIQUE NOT NULL"
+                    + "category_name VARCHAR(255) UNIQUE NOT NULL"
                     + ")";
             statement.executeUpdate(createCategoriesTable);
 
@@ -59,10 +59,10 @@ public class CreateTables {
              */
             String createItemsTable = "CREATE TABLE items ("
                     + "item_id INT AUTO_INCREMENT PRIMARY KEY,"
-                    + "title VARCHAR(255) NOT NULL,"
-                    + "description TEXT NOT NULL,"
+                    + "item_name VARCHAR(255) NOT NULL,"
+                    + "item_description TEXT NOT NULL,"
                     + "date_posted DATE NOT NULL,"
-                    + "price DECIMAL(10, 2) NOT NULL,"
+                    + "item_price DECIMAL(10, 2) NOT NULL,"
                     + "username varchar(20) NOT NULL,"
                     + "FOREIGN KEY (username) REFERENCES users(username)"
                     + ")";
@@ -98,14 +98,11 @@ public class CreateTables {
                     + ")";
 
             statement.executeUpdate(createReviewsTable);
-
-            System.out.println("Tables created successfully.");
             insertData();
         } catch (SQLException e){
             e.printStackTrace();
         }
     }
-
 
     /**
      * dummy data to insert
@@ -125,40 +122,40 @@ public class CreateTables {
 
 
         String[] categoryNames = new String[]{"Electronics", "Gadgets", "Accessories", "Books", "Fiction", "Non-Fiction", "Automotive", "Home", "Garden"};
+
         for (String categoryName : categoryNames) {
             categoriesDatabase.insertCategory(categoryName);
         }
 
+        // User 1: username
         // insert item 1
         int itemId1 = itemsDatabase.insertItem("Item 1", "Description 1", 10.99, username1);
-        System.out.println("itemid: " + itemId1 + "/n");
         itemsDatabase.insertItemCategories(itemId1, new String[]{"Electronics", "Gadgets"});
 
+        // User 2: ecattenach0
         // insert item 2
         int itemId2 = itemsDatabase.insertItem("Item 2", "Description 2", 15.99, username2);
-        System.out.println("itemid2: " + itemId2 + "/n");
         itemsDatabase.insertItemCategories(itemId2, new String[]{"Electronics", "Accessories"});
 
+        // User 3: fgearing1
         // insert item 3
         int itemId3 = itemsDatabase.insertItem("Item 3", "Description 3", 20.99, username3);
-        System.out.println("itemid3: " + itemId3 + "/n");
         itemsDatabase.insertItemCategories(itemId3, new String[]{"Books", "Fiction"});
 
-
+        // User 4: etommen2
         // insert item 4
         int itemId4 = itemsDatabase.insertItem("Item 4", "Description 4", 25.99, username4);
-        System.out.println("itemid4: " + itemId4 + "/n");
         itemsDatabase.insertItemCategories(itemId4, new String[]{"Books", "Non-Fiction"});
 
 
         // insert item 5
         int itemId5 = itemsDatabase.insertItem("Item 5", "Description 5", 50.99, username4);
-        System.out.println("itemid5: " + itemId5);
         itemsDatabase.insertItemCategories(itemId5, new String[]{"Automotive", "Accessories"});
 
         //insert item 6
         int itemId6 = itemsDatabase.insertItem("Item 6", "Description 6", 1999.99, username4);
-        System.out.println("itemid6: " + itemId6);
-        itemsDatabase.insertItemCategories(itemId5, new String[]{"Home", "Garden"});
+        itemsDatabase.insertItemCategories(itemId6, new String[]{"Home", "Accessories"});
+
+        itemsDatabase.toString();
     }
 }

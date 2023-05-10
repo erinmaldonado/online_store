@@ -1,6 +1,8 @@
 package com.example.login;
 
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class CategoriesDatabase {
     public  CategoriesDatabase(){
@@ -10,7 +12,7 @@ public class CategoriesDatabase {
         int categoryId = getCategoryIdByName(categoryName);
 
         if (categoryId == -1) {
-            String query = "INSERT INTO categories (name) VALUES (?)";
+            String query = "INSERT INTO categories (category_name) VALUES (?)";
 
             try (Connection connection = DBConnection.getConnection();
                  PreparedStatement preparedStatement = connection.prepareStatement(query, Statement.RETURN_GENERATED_KEYS)) {
@@ -31,7 +33,7 @@ public class CategoriesDatabase {
     }
 
     public int getCategoryIdByName(String categoryName) {
-        String query = "SELECT category_id FROM categories WHERE name = ?";
+        String query = "SELECT category_id FROM categories WHERE category_name = ?";
         int categoryId = -1;
 
         try (Connection connection = DBConnection.getConnection();
@@ -51,39 +53,65 @@ public class CategoriesDatabase {
         return categoryId;
     }
 
-    public int getCategoryId(int itemId) {
-        int categoryId = -1;
-        String query = "SELECT category_id FROM item_categories WHERE item_id = ?";
-        try (Connection connection = DBConnection.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(query)){
-
-            preparedStatement.setInt(1, itemId);
-            ResultSet resultSet = preparedStatement.executeQuery();
-            if (resultSet.next()) {
-                categoryId = resultSet.getInt("category_id");
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return categoryId;
-    }
-
-    public String getCategoryName(int categoryId) {
-        String itemName = "";
-        String query = "SELECT name FROM categories WHERE  category_id = ?";
+    public String getCategoryNameWithId(int categoryId) {
+        String categoryName = "";
+        String query = "SELECT category_name FROM categories WHERE  category_id = ?";
         try (Connection connection = DBConnection.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(query)){
 
             preparedStatement.setInt(1, categoryId);
             ResultSet resultSet = preparedStatement.executeQuery();
             if (resultSet.next()) {
-                itemName = resultSet.getString("name");
+                categoryName = resultSet.getString("category_name");
             }
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        return itemName;
+        return categoryName;
     }
 
+    public List<String> getCategoryNamesWithItemId(int itemId){
+        List<String> categories = new ArrayList<>();
 
+        String query = "SELECT c.category_name " +
+                "FROM categories c " +
+                "JOIN item_categories ic ON c.category_id = ic.category_id " +
+                "WHERE ic.item_id = ?";
+
+        try (Connection connection = DBConnection.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+
+            preparedStatement.setInt(1, itemId);
+
+            ResultSet resultSet = preparedStatement.executeQuery();
+            while (resultSet.next()) {
+                categories.add(resultSet.getString("category_name"));
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return categories;
+    }
+
+    public String getCategoryNameWithItemId(int itemId){
+        String categoryName = "";
+
+        String query = "SELECT c.category_name " +
+                "FROM categories c " +
+                "JOIN item_categories ic ON c.category_id = ic.category_id " +
+                "WHERE ic.item_id = ?";
+
+        try (Connection connection = DBConnection.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+
+            preparedStatement.setInt(1, itemId);
+
+            ResultSet resultSet = preparedStatement.executeQuery();
+            resultSet.getString(categoryName);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return categoryName;
+    }
 }

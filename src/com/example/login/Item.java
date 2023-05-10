@@ -1,6 +1,7 @@
 package com.example.login;
 
 import java.sql.Date;
+import java.util.List;
 
 /**
  * Represents an item.
@@ -13,7 +14,9 @@ public class Item {
     private double itemPrice;
     private Date datePosted;
     private String username;
-    int categoryId;
+    private int categoryId;
+    private String categoryName;
+    private List<String> categoriesList;
 
     /**
      * Class constructor
@@ -40,6 +43,7 @@ public class Item {
         this.username = username;
     }
 
+    //Getters
     /**
      * Returns the item's id which has been generated
      * automatically  using auto-increment feature
@@ -76,13 +80,24 @@ public class Item {
         return itemPrice;
     }
 
-    public Object getUsername() {
+    public Date getDatePosted() {
+        return datePosted;
+    }
+
+    public String getUsername() {
         return username;
     }
 
-    public void setCategoryId(int categoryId) {
-        this.categoryId = categoryId;
+    public String getCategoryName() {
+        return categoryName;
     }
+
+    public List<String> getCategoryNames() {
+        return categoriesList;
+    } // End Getters
+
+
+    // Beginning Setters
 
     public void setItemId(int itemId) {
         this.itemId = itemId;
@@ -100,11 +115,42 @@ public class Item {
         this.itemPrice = itemPrice;
     }
 
+
+    public void setDatePosted(Date datePosted){
+        this.datePosted = datePosted;
+    }
+
+
     public void setUsername(String username) {
         this.username = username;
     }
 
-    public int getCategoryId() {
-        return categoryId;
+    public void setCategoryId(int categoryId) {
+        this.categoryId = categoryId;
+    }
+
+    public void setCategoryName(String categoryName){
+        this.categoryName = categoryName;
+    }
+
+    public void setCategoryNames(List<String> categoriesList) {
+        this.categoriesList = categoriesList;
+    }
+
+// End Setters
+
+
+
+    @Override
+    public String toString(){
+        return "Item id: " + itemId + "\n" +
+                "Item Name: " + itemName + "\n" +
+                "Item Description: " +itemDescription + "\n" +
+                "Item Price: " + itemPrice + "\n" +
+                "Date Posted: " + datePosted + "\n" +
+                "Username: " + username + "\n" +
+                "Category id: " + categoryId + "\n" +
+                "Category Name: " + categoryName + "\n" +
+                "Categories List: " + categoriesList;
     }
 }
