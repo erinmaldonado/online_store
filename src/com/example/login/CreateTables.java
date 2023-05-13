@@ -6,6 +6,7 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
+import java.util.Random;
 
 /**
  * This creates the tables to be used in the database.
@@ -14,11 +15,28 @@ public class CreateTables {
     UserDatabase userDatabase = new UserDatabase();
     ItemsDatabase itemsDatabase = new ItemsDatabase();
     CategoriesDatabase categoriesDatabase = new CategoriesDatabase();
+    ReviewsDatabase reviewsDatabase = new ReviewsDatabase();
+    FavoritesDatabase favoritesDatabase = new FavoritesDatabase();
 
-    CreateTables(){
+    // Add categories
+    String[] categoryNames = new String[]{"Electronics", "Gadgets", "Accessories", "Books", "Fiction", "Non-Fiction", "Automotive", "Home", "Garden", "Tires"};
+
+    // Dummy data for reviews
+    String[] scores = {"Excellent", "Good", "Fair", "Poor"};
+
+    // Add users
+    List<User> usersList = new ArrayList<>();
+
+    // Dummy data for remarks
+    String[] remarks = new String[10];
+
+    int itemId = -1;
+
+    CreateTables() {
     }
 
     public void dropTables(Statement statement) throws SQLException {
+        statement.execute("DROP TABLE IF EXISTS favorites");
         statement.execute("DROP TABLE IF EXISTS reviews");
         statement.execute("DROP TABLE IF EXISTS item_categories");
         statement.execute("DROP TABLE IF EXISTS items");
@@ -26,7 +44,7 @@ public class CreateTables {
         statement.execute("DROP TABLE IF EXISTS users");
     }
 
-    public void create(){
+    public void create() {
         try {
             DBConnection createSchema = new DBConnection();
             createSchema.create();
@@ -38,9 +56,9 @@ public class CreateTables {
             /**
              * Table for storing user information.
              */
-            String createUsersTable = "CREATE TABLE users ("
-                    + "username varchar(20) NOT NULL,"
-                    + "password varchar(20) NOT NULL,"
+            String createUsersTable = "CREATE TABLE IF NOT EXISTS users ("
+                    + "username varchar(99) NOT NULL,"
+                    + "password varchar(99) NOT NULL,"
                     + "firstName varchar(20) NOT NULL,"
                     + "lastName varchar(20) NOT NULL,"
                     + "email varchar(99) NOT NULL,"
@@ -51,7 +69,7 @@ public class CreateTables {
             /**
              * Table for storing category information.
              */
-            String createCategoriesTable = "CREATE TABLE categories ("
+            String createCategoriesTable = "CREATE TABLE IF NOT EXISTS categories ("
                     + "category_id INT AUTO_INCREMENT PRIMARY KEY,"
                     + "category_name VARCHAR(255) UNIQUE NOT NULL"
                     + ")";
@@ -60,7 +78,7 @@ public class CreateTables {
             /**
              * Table for storing item information.
              */
-            String createItemsTable = "CREATE TABLE items ("
+            String createItemsTable = "CREATE TABLE IF NOT EXISTS items ("
                     + "item_id INT AUTO_INCREMENT PRIMARY KEY,"
                     + "item_name VARCHAR(255) NOT NULL,"
                     + "item_description TEXT NOT NULL,"
@@ -76,7 +94,7 @@ public class CreateTables {
             /**
              * Table for storing item category information.
              */
-            String createItemCategoriesTable = "CREATE TABLE item_categories ("
+            String createItemCategoriesTable = "CREATE TABLE IF NOT EXISTS item_categories ("
                     + "item_id INT NOT NULL,"
                     + "category_id INT NOT NULL,"
                     + "PRIMARY KEY (item_id, category_id),"
@@ -88,7 +106,7 @@ public class CreateTables {
             /**
              * Table for storing item reviews.
              */
-            String createReviewsTable = "CREATE TABLE reviews ("
+            String createReviewsTable = "CREATE TABLE IF NOT EXISTS reviews ("
                     + "review_id INT AUTO_INCREMENT PRIMARY KEY,"
                     + "item_id INT NOT NULL,"
                     + "username varchar(20) NOT NULL,"
@@ -101,92 +119,162 @@ public class CreateTables {
                     + ")";
 
             statement.executeUpdate(createReviewsTable);
+
+            String createFavoritesTable = "CREATE TABLE IF NOT EXISTS favorites ("
+                    + "username VARCHAR(20) NOT NULL,"
+                    + "favorite_user VARCHAR(20) NOT NULL,"
+                    + "FOREIGN KEY (username) REFERENCES users(username),"
+                    + "FOREIGN KEY (favorite_user) REFERENCES users(username),"
+                    + "PRIMARY KEY (username, favorite_user)"
+                    + ")";
+
+            statement.executeUpdate(createFavoritesTable);
+
+
             insertData();
-        } catch (SQLException e){
+        } catch (SQLException e) {
             e.printStackTrace();
         }
     }
 
-    /**
-     * dummy data to insert
-     */
-    public void insertData() {
-        // Add categories
-        String[] categoryNames = new String[]{"Electronics", "Gadgets", "Accessories", "Books", "Fiction", "Non-Fiction", "Automotive", "Home", "Garden"};
+    public static int getRandom(String[] arr) {
+        int rand = new Random().nextInt(arr.length);
+        return rand;
+    }
 
-        for (String categoryName : categoryNames) {
-            categoriesDatabase.insertCategory(categoryName);
+    public int getRandomFromArray(List<User> list) {
+        Random rand = new Random();
+        return rand.nextInt(list.size());
+    }
+
+
+    /**
+     * Dummy data for testing purposes
+     */
+    public void insertData() throws SQLException {
+        if(userDatabase.isTableEmpty()){
+            for (int i = 0; i < 50; i++) {
+                User user = new User(("username" + i), ("password" + i), ("firstName" + i), ("lastName" + i), ("email" + i + "@gmail.com"));
+                usersList.add(user);
+                userDatabase.insertUser(user);
+            }
+        }
+
+        if(categoriesDatabase.isTableEmpty()){
+            // Insert category names into database
+            for (String categoryName : categoryNames) {
+                categoriesDatabase.insertCategory(categoryName);
+            }
+
         }
 
         // Current date
         Date datePosted = new java.sql.Date(Calendar.getInstance().getTime().getTime());
-        Date previousDatePosted = new Date(01/01/2020);
 
-        // User #1
-        String username = "username";
-        String password = "password";
-        String firstName = "Erin";
-        String lastName = "Maldonado";
-        String email = "erin@gmail.com";
-        User user = new User(username, password, firstName, lastName, email);
-        userDatabase.insertUser(user);
+        for (int i = 0; i < 10; i++) {
+            remarks[i] = "I rate this item a " + (i + 1) + " out of 10";
+        }
 
-        // User 1: item 1
-        int itemId1 = itemsDatabase.insertItem("Item 1", "Description 1", datePosted, 10.99, username);
-        itemsDatabase.insertItemCategories(itemId1, new String[]{"Electronics", "Gadgets"});
+        if(itemsDatabase.isTableEmpty()){
+            // Insert items into database
+            for (int i = 0; i < 60; i++) {
+                int random = getRandomFromArray(usersList);
+                User user = usersList.get(random);
+                String username = user.getUsername();
 
-        userDatabase.loadUserItems(user);
+                String itemName = "item: " + i;
+                String itemDescription = "description: " + i;
+                Random r = new Random();
 
-        // User #2
-        username = "username2";
-        password = "pw2";
-        firstName = "First2";
-        lastName = "Last2";
-        email = "username2@gmail.com";
-        user = new User(username, password, firstName, lastName, email);
-        userDatabase.insertUser(user);
+                double randomPrice = 0.99 + (1999.99 - .99) * r.nextDouble();
+                double itemPrice = randomPrice;
 
-        // User 2: item 3
-        int itemId2 = itemsDatabase.insertItem("Item 2", "Description 2", previousDatePosted, 15.99, username);
-        itemsDatabase.insertItemCategories(itemId2, new String[]{"Electronics", "Accessories"});
-        userDatabase.loadUserItems(user);
+                itemId = itemsDatabase.insertItem(itemName, itemDescription, datePosted, itemPrice, username);
 
-        // User #3
-        username = "username3";
-        password = "pw3";
-        firstName = "First3";
-        lastName = "Last3";
-        email = "username3@gmail.com";
-        user = new User(username, password, firstName, lastName, email);
-        userDatabase.insertUser(user);
+                Item item = new Item(itemId, itemName, itemDescription, datePosted, itemPrice, username);
+                user.addUserItem(item);
 
-        // User 3: item 3
-        int itemId3 = itemsDatabase.insertItem("Item 3", "Description 3", previousDatePosted, 20.99, username);
-        itemsDatabase.insertItemCategories(itemId3, new String[]{"Books", "Fiction"});
-        userDatabase.loadUserItems(user);
+                int j = getRandom(categoryNames);
+                int k = getRandom(categoryNames);
 
-        // User #4
-        username = "username4";
-        password = "pw4";
-        firstName = "First4";
-        lastName = "Last4";
-        email = "username4@gmail.com";
-        user = new User(username, password, firstName, lastName, email);
-        userDatabase.insertUser(user);
+                if (j != k) {
+                    itemsDatabase.insertItemCategories(itemId, new String[]{categoryNames[j], categoryNames[k]});
+                } else {
+                    itemsDatabase.insertItemCategories(itemId, new String[]{categoryNames[j]});
+                }
+            }
+        }
 
-        // User 4: item 4
-        int itemId4 = itemsDatabase.insertItem("Item 4", "Description 4", datePosted, 25.99, username);
-        itemsDatabase.insertItemCategories(itemId4, new String[]{"Books", "Non-Fiction"});
+        if(reviewsDatabase.isTableEmpty()){
+            // Insert reviews into database
+            for (int i = 0; i < usersList.size(); i++) {
+                User user = usersList.get(i);
+                String username = user.getUsername();
+                List<Item> items = user.getItemList();
 
-        // User 4: item 5
-        int itemId5 = itemsDatabase.insertItem("Item 5", "Description 5", datePosted, 50.99, username);
-        itemsDatabase.insertItemCategories(itemId5, new String[]{"Automotive", "Accessories"});
+                for (int j = 0; j < items.size(); j++) {
+                    Item item = items.get(j);
+                    itemId = item.getItemId();
 
+                    int l;
+                    User reviewer;
+                    String reviewerUsername;
 
-        // User 4: item 6
-        int itemId6 = itemsDatabase.insertItem("Item 6", "Description 6", datePosted, 1999.99, username);
-        itemsDatabase.insertItemCategories(itemId6, new String[]{"Home", "Garden"});
+                    int totalReviews = reviewsDatabase.getTotalReviews(itemId);
+                    while (totalReviews < 6) {
+                        do {
+                            l = getRandomFromArray(usersList);
+                            reviewer = usersList.get(l);
+                            reviewerUsername = reviewer.getUsername();
+                        } while (username.equals(reviewerUsername) || reviewsDatabase.userReviewedItem(reviewerUsername, itemId));
 
-        userDatabase.loadUserItems(user);
+                        int m = getRandom(remarks);
+
+                        if (j == 0 && i < usersList.size()/2) { // Ensure first item for each user has only "Excellent" or "Good" reviews.
+                            if (m >= 4 && m <= 6) { // between 5 and 6
+                                l = 1; // Good
+                            } else if (m > 6 && m <= 9) { // between 7 and 9
+                                l = 0; // Excellent
+                            }
+                        } else {
+                            if (m >= 0 && m <= 2) { // between 0 and 2
+                                l = 3; // Poor
+                            } else if (m > 2 && m <= 4) { // between 3 and 4
+                                l = 2; // Fair
+                            } else if (m > 4 && m <= 6) { // between 5 and 6
+                                l = 1; // Good
+                            } else if (m > 6 && m <= 9) { // between 7 and 9
+                                l = 0; // Excellent
+                            }
+                        }
+
+                        if (l >= 0 && l < scores.length && m >= 0 && m < remarks.length) { // Ensure we have a valid index for scores and remarks arrays
+                            reviewsDatabase.insertReview(itemId, reviewerUsername, scores[l], remarks[m]);
+                            totalReviews = reviewsDatabase.getTotalReviews(itemId);
+                        }
+                    }
+                }
+            }
+        }
+
+        if(favoritesDatabase.isTableEmpty()){
+            for (int i = 0; i < usersList.size(); i++) {
+                int count = 0;
+                User user = usersList.get(i);
+                String username = user.getUsername();
+                List<User> favoriteUsers = new ArrayList<>();
+
+                while (count < 5) {
+                    int random = getRandomFromArray(usersList);
+                    User favoriteUser = usersList.get(random);
+                    if (!favoriteUsers.contains(favoriteUser) && !user.equals(favoriteUser)) {
+                        favoriteUsers.add(favoriteUser);
+                        favoritesDatabase.insertFavorite(username, favoriteUser.getUsername());
+                        count++;
+                    }
+                }
+                user.setUserFavorites(favoriteUsers);
+            }
+        }
     }
 }

@@ -2,24 +2,33 @@ package com.example.login;
 
 public class Review {
     private final String username;
-    private final String rating;
-    private final String description;
+    private final String score;
+    private final String remark;
+    private int itemId;
 
-    public Review(String username, String rating, String description) {
+    public Review(String username, String score, String remark) {
         this.username = username;
-        this.rating = rating;
-        this.description = description;
+        this.score = score;
+        this.remark = remark;
+    }
+
+    public void setItemId(int itemId){
+        this.itemId = itemId;
+    }
+
+    public int getItemId(){
+        return itemId;
     }
 
     public String getUsername() {
         return username;
     }
 
-    public String getRating() {
-        return rating;
+    public String getDescription() {
+        return remark;
     }
 
-    public String getDescription() {
-        return description;
+    public Object getScore() {
+        return score;
     }
 }

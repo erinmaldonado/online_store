@@ -114,4 +114,20 @@ public class CategoriesDatabase {
         }
         return categoryName;
     }
+
+    public boolean isTableEmpty() throws SQLException {
+        String query = "SELECT COUNT(*) FROM categories";
+
+        try (Connection connection = DBConnection.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+            ResultSet rs = preparedStatement.executeQuery(query);
+
+            if (rs.next()) {
+                int count = rs.getInt(1);
+                return count == 0;
+            } else {
+                return true;
+            }
+        }
+    }
 }

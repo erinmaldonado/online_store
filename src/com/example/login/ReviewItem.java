@@ -109,10 +109,10 @@ public class ReviewItem {
                 } else if(reviewsDb.hasPostedThreeReviews(currentUser.getUsername())) {
                     JOptionPane.showMessageDialog(null, "You have reached the daily limit for reviews. You can submit a maximum of 3 reviews per day.", "Error", JOptionPane.ERROR_MESSAGE);
                 } else {
-                    String rating = (String) ratingDropdown.getSelectedItem();
-                    String description = reviewDescription.getText();
+                    String score = (String) ratingDropdown.getSelectedItem();
+                    String remark = reviewDescription.getText();
                     ReviewsDatabase reviewsDatabase = new ReviewsDatabase();
-                    reviewsDatabase.insertReview(itemId, currentUser.getUsername(), rating, description);
+                    reviewsDatabase.insertReview(itemId, currentUser.getUsername(), score, remark);
                     JOptionPane.showMessageDialog(null, "Thank you for reviewing this item. Review has been added.", "Review added", JOptionPane.PLAIN_MESSAGE);
                     reviewFrame.dispose();
                 }

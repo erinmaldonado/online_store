@@ -1,5 +1,6 @@
 package com.example.login;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class User {
@@ -8,16 +9,15 @@ public class User {
 	private String firstName;
 	private String lastName;
 	private String email;
-	private List<Item> itemList;
+	private List<Item> itemList = new ArrayList<>();
+	private List<User> userFavorites = new ArrayList<>();
 
 	User(){
 
 	}
 
-	User(String username, String firstName, String lastName){
+	User(String username){
 		this.username = username;
-		this.firstName = firstName;
-		this.lastName = lastName;
 	}
 
 	User(String username, String password, String firstName, String lastName, String email){
@@ -52,7 +52,19 @@ public class User {
 		return itemList;
 	}
 
+	public int getNumberOfItemsPosted(){
+		return itemList.size();
+	}
+
 	public void setUserItems(List<Item> itemList){
 		this.itemList = itemList;
+	}
+
+	public void setUserFavorites(List<User> userFavorites){
+		this.userFavorites = userFavorites;
+	}
+
+	public void addUserItem(Item item){
+		itemList.add(item);
 	}
 }

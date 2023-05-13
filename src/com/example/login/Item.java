@@ -164,8 +164,6 @@ public class Item {
                 "Item Description: " +itemDescription + "\n" +
                 "Item Price: " + itemPrice + "\n" +
                 "Date Posted: " + datePosted + "\n" +
-                "Username: " + username + "\n" +
-                "Category Name: " + categoryName + "\n" +
-                "Categories List: " + categoriesList;
+                "Username: " + username + "\n";
     }
 }

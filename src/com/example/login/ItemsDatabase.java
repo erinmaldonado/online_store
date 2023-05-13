@@ -11,7 +11,7 @@ import java.util.List;
 public class ItemsDatabase {
     public ItemsDatabase(){}
 
-    /**
+        /**
      * @param itemName
      * @param itemDescription
      * @param itemPrice
@@ -240,4 +240,44 @@ public class ItemsDatabase {
         }
         return userItems;
     }
+
+    public List<Integer> getItemIdsByUsername(String username) {
+        List<Integer> itemIds = new ArrayList<>();
+
+        String query = "SELECT item_id FROM items WHERE username = ?";
+
+        try (Connection connection = DBConnection.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+
+            preparedStatement.setString(1, username);
+
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            while (resultSet.next()) {
+                int itemId = resultSet.getInt("item_id");
+                itemIds.add(itemId);
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return itemIds;
+    }
+
+    public boolean isTableEmpty() throws SQLException {
+        String query = "SELECT COUNT(*) FROM items";
+
+        try (Connection connection = DBConnection.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+            ResultSet rs = preparedStatement.executeQuery(query);
+
+            if (rs.next()) {
+                int count = rs.getInt(1);
+                return count == 0;
+            } else {
+                return true;
+            }
+        }
+    }
+
 }

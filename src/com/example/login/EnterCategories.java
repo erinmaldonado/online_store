@@ -2,7 +2,6 @@ package com.example.login;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
-import java.awt.*;
 import java.util.List;
 
 public class EnterCategories {
@@ -10,6 +9,7 @@ public class EnterCategories {
     JPanel searchUsersPanel;
     private JTextField category2TextField;
     private JButton searchUsersButton;
+    private JButton backButton;
 
     public EnterCategories(){
 
